@@ -12,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <meta name="og:title" content={name} />
       </Head>
       <header>
-        <h1 style={{ fontSize: '7rem' }}><Link href='/'>{name}</Link></h1>
+        <h1 style={{ fontSize: '6rem' }}><Link href='/'>{name}</Link></h1>
       </header>
       <main>{children}</main>
     </div>
