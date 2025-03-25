@@ -3,6 +3,7 @@ import { Stay, Props } from '@/graviton/types'
 import { fetchData } from '@/graviton/lib/data'
 import Layout from '@/graviton/components/layout'
 import { useRouter } from 'next/router'
+import InstagramEmbed from '../components/instagramEmbed'
 
 export async function getServerSideProps() {
   try {
@@ -33,7 +34,7 @@ export default function Stays({ stays }: Props) {
     <Layout>
       <h1 style={{ fontSize: '4rem' }}>{location}</h1>
       <ul>
-        {filteredStays.map(({ name, location, type, description, link }: Stay) => (
+        {filteredStays.map(({ name, location, type, description, image, link }: Stay) => (
           <li key={name}>
             <strong>{name}</strong>
             <br />
@@ -43,9 +44,10 @@ export default function Stays({ stays }: Props) {
             <br />
             <p>{description}</p>
             <br />
+            {!!image && <div style={{ padding: '2rem' }}><InstagramEmbed embedHTML={image}/></div>}
             <Link href={link}></Link>
-          </li>
-        ))}
+          </li>),
+        )}
       </ul>
     </Layout>
   )
