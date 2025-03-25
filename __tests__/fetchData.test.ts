@@ -1,4 +1,4 @@
-import { fetchData } from '../lib/data'
+import { fetchData } from '@/graviton/lib/data'
 
 describe('fetchData', () => {
   it('fetches and transforms data from Google Sheets', async () => {
