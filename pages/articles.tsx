@@ -1,26 +1,45 @@
-import { useAppState } from './_app'
-import { Article } from '../types'
+import { Article, Props } from '@/graviton/types'
 import Layout from '@/graviton/components/layout'
+import Link from 'next/link'
+import { fetchData } from '@/graviton/lib/data'
 
-export default function Articles() {
-  const { articles } = useAppState()
+export async function getServerSideProps() {
+  try {
+    const { stays, articles } = await fetchData()
+    return {
+      props: {
+        stays,
+        articles,
+      },
+    }
+  } catch (error) {
+    console.error('Fetch error:', error)
+    return {
+      props: {
+        stays: [],
+        articles: [],
+      },
+    }
+  }
+}
+
+export default function Articles({ articles }: Props) {
   return (
     <Layout>
-      <h1 className="text-2xl font-bold mb-4">Articles</h1>
-      <ul>
-        {articles.map(({ title, author, text, tags }: Article) => (
-          <li key={title}>
-            <strong>{title}</strong>
-            <br />
-            {author}
-            <br />
-            {text}
-            <br />
-            {tags}
-            <br />
-          </li>
-        ))}
-      </ul>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
+        {articles.map((article: Article) => {
+          const href = `/article?title=${encodeURIComponent(article.title)}`
+          return (
+            <div style={{ padding: '2rem', maxWidth: '45rem', border: '1px solid black' }} key={article.id}>
+              <Link style={{
+                color: 'black',
+                textDecoration: 'none',
+                fontSize: '1.5rem' }} href={href}><strong>{article.title}</strong></Link>
+              <p>By {article.author}</p>
+              <p>{article.text.substring(0, 200)}...</p>
+            </div>
+          )})}
+      </div>
     </Layout>
   )
 }

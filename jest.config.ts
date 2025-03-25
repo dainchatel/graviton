@@ -1,11 +1,11 @@
 import type { Config } from 'jest'
 import nextJest from 'next/jest.js'
- 
+
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
   dir: './',
 })
- 
+
 /**
  * For a detailed explanation regarding each configuration property, visit:
  * https://jestjs.io/docs/configuration
@@ -170,9 +170,10 @@ const config: Config = {
   // ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
-  // testPathIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/__tests__/fixtures/',
+  ],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
   // testRegex: [],

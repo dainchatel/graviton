@@ -17,7 +17,6 @@ export const filterRawStays = (rawStay: GoogleSpreadsheetRow): GoogleSpreadsheet
   rawStay.get(LOCATION) &&
   rawStay.get(DESCRIPTION) &&
   rawStay.get(TYPE) &&
-  rawStay.get(COORDINATES) &&
   rawStay.get(LINK)
 
 
@@ -28,7 +27,7 @@ export const mapRawStays = (rawStay: GoogleSpreadsheetRow): Stay => ({
   description: rawStay.get(DESCRIPTION),
   type: rawStay.get(TYPE),
   coordinates: rawStay.get(COORDINATES),
-  image: rawStay.get(IMAGE),
+  image: rawStay.get(IMAGE) ?? null,
   tags: rawStay.get(TAGS) ? rawStay.get('Tags').split(',') : [],
   link: rawStay.get(LINK),
   score: rawStay.get(SCORE) ?? null,

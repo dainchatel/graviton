@@ -1,22 +1,47 @@
 import Link from 'next/link'
-import { useAppState } from './_app'
-import { Stay } from '../types'
+import { Stay, Props } from '@/graviton/types'
+import { fetchData } from '@/graviton/lib/data'
 import Layout from '@/graviton/components/layout'
+import { useRouter } from 'next/router'
 
-export default function Stays() {
-  const { stays } = useAppState()
+export async function getServerSideProps() {
+  try {
+    const { stays, articles } = await fetchData()
+    return {
+      props: {
+        stays,
+        articles,
+      },
+    }
+  } catch (error) {
+    console.error('Fetch error:', error)
+    return {
+      props: {
+        stays: [],
+        articles: [],
+      },
+    }
+  }
+}
+
+export default function Stays({ stays }: Props) {
+  const router = useRouter()
+  const { location } = router.query
+  const filteredStays = stays.filter(stay => stay.location === location)
   
   return (
     <Layout>
-      <h1 className="text-2xl font-bold mb-4">Stays</h1>
+      <h1 style={{ fontSize: '4rem' }}>{location}</h1>
       <ul>
-        {stays.map(({ name, location, type, link }: Stay) => (
+        {filteredStays.map(({ name, location, type, description, link }: Stay) => (
           <li key={name}>
             <strong>{name}</strong>
             <br />
             {location}
             <br />
             {type}
+            <br />
+            <p>{description}</p>
             <br />
             <Link href={link}></Link>
           </li>
