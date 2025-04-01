@@ -1,1 +1,1 @@
-export const name = 'Hotel emoji >>'
+export const name = 'Hotel Emoji'

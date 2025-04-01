@@ -1,0 +1,3 @@
+div:hover > .marker-label {
+  opacity: 1;
+}

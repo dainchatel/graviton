@@ -32,3 +32,9 @@ export const mapRawStays = (rawStay: GoogleSpreadsheetRow): Stay => ({
   link: rawStay.get(LINK),
   score: rawStay.get(SCORE) ?? null,
 })
+
+export type Location = {
+  name: string
+  latitude: number
+  longitude: number
+}
