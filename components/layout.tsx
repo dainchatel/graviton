@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { name } from '@/graviton/lib/consts'
+import '../styles/globals.css'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
