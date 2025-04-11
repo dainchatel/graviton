@@ -54,12 +54,14 @@ export default function Stays({ stays }: Props) {
               </li>),
             )}
           </ul>
-          <MapComponent
-            stayMarkers={filteredStays.map(stay => ({ 
-              name: stay.name, 
-              latitude: Number(stay.coordinates.split(',')[0]), 
-              longitude: Number(stay.coordinates.split(',')[1]) }))} 
-          />
+          <div style={{ position: 'sticky', top: '1rem', alignSelf: 'flex-start' }}>
+            <MapComponent
+              stayMarkers={filteredStays.map(stay => ({ 
+                name: stay.name, 
+                latitude: Number(stay.coordinates.split(',')[0]), 
+                longitude: Number(stay.coordinates.split(',')[1]) }))} 
+            />
+          </div>
         </main>
       </Layout>
     )
