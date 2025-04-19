@@ -33,7 +33,7 @@ export const mockArticles: Article[] = [
     title: 'Last Article',
     author: 'Jane Doe',
     text: 'More article text',
-    tags: [],
+    tags: ['bogus dump'],
     image: 'another_img_url',
     header: true,
   },
