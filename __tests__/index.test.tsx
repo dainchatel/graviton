@@ -1,8 +1,21 @@
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { name } from '@/graviton/lib/consts'
 import Home from '@/graviton/pages'
 import { mockStays, mockArticles } from './fixtures/index'
+
+jest.unmock('next/router')
+
+const mockPush = jest.fn()
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    pathname: '/',
+    query: {},
+    asPath: '/',
+    isReady: true,
+  }),
+}))
  
 describe('Home', () => {
   it('renders a heading', () => {
@@ -27,5 +40,25 @@ describe('Home', () => {
     expect(articlesLink).toBeInTheDocument()
     //but fourth article should not 
     expect(screen.queryByText('Last Article')).not.toBeInTheDocument()
+  })
+
+  
+  it('updates input value when user types', () => {
+    render(<Home stays={mockStays} articles={mockArticles} />)
+
+    const button = screen.getByRole('button')
+    expect(button).toBeInTheDocument()
+
+    const input = screen.getByPlaceholderText('Search...')
+    expect(input).toBeInTheDocument()
+
+    fireEvent.change(input, { target: { value: 'test query' } })
+    expect((input as HTMLInputElement).value).toBe('test query')
+
+    fireEvent.submit(input)
+    expect(mockPush).toHaveBeenCalledWith({
+      pathname: '/results',
+      query: { q: 'test query' },
+    })
   })
 })

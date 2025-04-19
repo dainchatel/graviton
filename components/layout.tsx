@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { name } from '@/graviton/lib/consts'
+import SearchInput from './searchInput'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,13 +18,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <link rel="icon" href="/favicon.ico" />
         <meta name="og:title" content={name} />
       </Head>
-      <header>
-        <h1 style={{ fontSize: '6rem' }}><Link  style={{ 
-          color: 'black', 
-          textDecoration: 'none',
-          fontWeight: 'boldest',
-        }} href='/'>{name}</Link></h1>
-      </header>
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <header>
+          <h1 style={{ fontSize: '6rem' }}><Link  style={{ 
+            color: 'black', 
+            textDecoration: 'none',
+            fontWeight: 'boldest',
+          }} href='/'>{name}</Link></h1>
+        </header>
+        <SearchInput/>
+      </div>
       <main>{children}</main>
       <footer style={{     display: 'flex', 
         justifyContent: 'center', 

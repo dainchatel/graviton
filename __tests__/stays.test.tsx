@@ -8,6 +8,12 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }))
 
+jest.mock('@/graviton/components/map', () => {
+  const MockMap = () => <div data-testid="mock-map" />
+  MockMap.displayName = 'MockMap'
+  return MockMap
+})
+
 describe('Stays Page', () => {
   it('renders stays from context', () => {
     (useRouter as jest.Mock).mockReturnValue({
