@@ -13,7 +13,7 @@ describe('Results', () => {
   it('renders locations', async () => {
     (useRouter as jest.Mock).mockReturnValue({ query: { q: 'berlin' } })
 
-    render(<Results stays={mockStays} articles={mockArticles} />)
+    render(<Results stays={mockStays} articles={mockArticles} locations={[]} />)
     
     await waitFor(() => {
       expect(screen.getByText('Locations')).toBeInTheDocument()
@@ -25,7 +25,7 @@ describe('Results', () => {
   it('renders stays matched by name', async () => {
     (useRouter as jest.Mock).mockReturnValue({ query: { q: 'bright' } })
 
-    render(<Results stays={mockStays} articles={mockArticles} />)
+    render(<Results stays={mockStays} articles={mockArticles} locations={[]} />)
     
     await waitFor(() => {
       expect(screen.getByText('Bright Apartment')).toBeInTheDocument()
@@ -35,7 +35,7 @@ describe('Results', () => {
   it('renders stays matching description', async () => {
     (useRouter as jest.Mock).mockReturnValue({ query: { q: 'descryption' } })
 
-    render(<Results stays={mockStays} articles={mockArticles} />)
+    render(<Results stays={mockStays} articles={mockArticles} locations={[]} />)
     
     await waitFor(() => {
       expect(screen.getByText('Stays')).toBeInTheDocument()
@@ -47,7 +47,7 @@ describe('Results', () => {
   it('renders articles matching title', async () => {
     (useRouter as jest.Mock).mockReturnValue({ query: { q: 'first' } })
 
-    render(<Results stays={mockStays} articles={mockArticles} />)
+    render(<Results stays={mockStays} articles={mockArticles} locations={[]} />)
     
     await waitFor(() => {
       expect(screen.getByText('Our First Article')).toBeInTheDocument()
@@ -57,7 +57,7 @@ describe('Results', () => {
   it('renders articles matching text', async () => {
     (useRouter as jest.Mock).mockReturnValue({ query: { q: 'another' } })
 
-    render(<Results stays={mockStays} articles={mockArticles} />)
+    render(<Results stays={mockStays} articles={mockArticles} locations={[]} />)
     
     await waitFor(() => {
       expect(screen.getByText('Second Amazing Article')).toBeInTheDocument()
@@ -68,7 +68,7 @@ describe('Results', () => {
   it('renders articles matching tags', async () => {
     (useRouter as jest.Mock).mockReturnValue({ query: { q: 'Bogus' } })
 
-    render(<Results stays={mockStays} articles={mockArticles} />)
+    render(<Results stays={mockStays} articles={mockArticles} locations={[]} />)
     
     await waitFor(() => {
       expect(screen.getByText('Last Article')).toBeInTheDocument()
@@ -78,7 +78,7 @@ describe('Results', () => {
   it('handles no matches gracefully', async () => {
     (useRouter as jest.Mock).mockReturnValue({ query: { q: 'asdlkfjasldfkj' } })
 
-    render(<Results stays={mockStays} articles={mockArticles} />)
+    render(<Results stays={mockStays} articles={mockArticles} locations={[]} />)
     
     await waitFor(() => {
       expect(screen.queryByText('Locations')).not.toBeInTheDocument()
@@ -90,7 +90,7 @@ describe('Results', () => {
   it('handles empty or missing query param', async () => {
     (useRouter as jest.Mock).mockReturnValue({ query: {} })
 
-    render(<Results stays={mockStays} articles={mockArticles} />)
+    render(<Results stays={mockStays} articles={mockArticles} locations={[]} />)
     
     await waitFor(() => {
       expect(screen.queryByText('Locations')).not.toBeInTheDocument()

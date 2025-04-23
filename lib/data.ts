@@ -13,11 +13,19 @@ export const fetchData = async () => {
   const stays = rawStays
     .filter(filterRawStays)
     .map(mapRawStays)
-  
+
   const rawArticles = await sheets[ARTICLES].getRows()
   const articles = rawArticles
     .filter(filterRawArticles)
     .map(mapRawArticles)
-    
-  return { stays, articles }
+
+  const locationSet = new Set<string>()
+  for (const stay of stays) {
+    locationSet.add(stay.location)
+  }
+
+  const locations = [...locationSet].sort()
+  const previewArticles = articles.reverse().slice(0, 3)
+
+  return { stays, articles, locations, previewArticles }
 }

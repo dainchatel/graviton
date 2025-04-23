@@ -5,6 +5,8 @@ export type Stay = {
   description: string
   type: string
   link: string
+  address: string
+  price: string
   coordinates: string
   image?: string
   tags?: string[]
@@ -24,4 +26,5 @@ export type Article = {
 export type Props = {
   stays: Stay[]
   articles: Article[]
+  locations: string[]
 }

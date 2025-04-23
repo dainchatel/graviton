@@ -11,13 +11,17 @@ const IMAGE = 'Image'
 const TAGS = 'Tags'
 const LINK = 'Link'
 const SCORE = 'Score'
+const PRICE = 'Price'
+const ADDRESS = 'Address'
 
 export const filterRawStays = (rawStay: GoogleSpreadsheetRow): GoogleSpreadsheetRow =>
   rawStay.get(NAME) &&
   rawStay.get(LOCATION) &&
   rawStay.get(DESCRIPTION) &&
   rawStay.get(TYPE) &&
-  rawStay.get(LINK)
+  rawStay.get(LINK) &&
+  rawStay.get(ADDRESS) &&
+  rawStay.get(PRICE)
 
 
 export const mapRawStays = (rawStay: GoogleSpreadsheetRow): Stay => ({
@@ -27,6 +31,8 @@ export const mapRawStays = (rawStay: GoogleSpreadsheetRow): Stay => ({
   description: rawStay.get(DESCRIPTION),
   type: rawStay.get(TYPE),
   coordinates: rawStay.get(COORDINATES),
+  address: rawStay.get(ADDRESS),
+  price: rawStay.get(PRICE),
   image: rawStay.get(IMAGE) ?? null,
   tags: rawStay.get(TAGS) ? rawStay.get('Tags').split(',') : [],
   link: rawStay.get(LINK),

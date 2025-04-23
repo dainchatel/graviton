@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/router'
-import StaysPage from '@/graviton/pages/stays'
+import Location from '@/graviton/pages/location'
 import { mockStays } from './fixtures'
 
 jest.mock('next/router', () => ({
@@ -14,13 +14,13 @@ jest.mock('@/graviton/components/map', () => {
   return MockMap
 })
 
-describe('Stays Page', () => {
-  it('renders stays from context', () => {
+describe('Location Page', () => {
+  it('renders location stays from context', () => {
     (useRouter as jest.Mock).mockReturnValue({
-      query: { location: 'Tokyo' },
+      query: { name: 'Tokyo' },
     })
 
-    render(<StaysPage stays={mockStays} articles={[]} />)
+    render(<Location stays={mockStays} articles={[]} locations={[]} />)
     // Berlin stays should not be rendered
     expect(screen.queryByText('The Dolli')).not.toBeInTheDocument()
     expect(screen.queryByText('The Hyatt')).not.toBeInTheDocument()
