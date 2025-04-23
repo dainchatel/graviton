@@ -18,7 +18,7 @@ export default function Stay({
   isProgrammaticScroll: React.RefObject<boolean>
   readyForScrollSync: React.RefObject<boolean>
 }) {
-  const { ref, inView } = useInView({ threshold: 0.6 })
+  const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: false })
 
   useEffect(() => {
     if (inView && !isProgrammaticScroll.current && readyForScrollSync.current) {
