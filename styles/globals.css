@@ -7,7 +7,6 @@ footer {
   justify-content: center;
   align-items: center;
   height: 4rem;
-  width: 100%;
 }
 
 div:hover > .marker-label {
