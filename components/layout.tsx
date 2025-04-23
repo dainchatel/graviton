@@ -39,7 +39,7 @@ export default function Layout({ children, locations }: { children: React.ReactN
         // minHeight: 0, 
       }}>{children}</main>
       <footer>
-        <div style={{ width: '5rem' }}>© 2025</div>
+        <div>© 2025</div>
       </footer>
     </div>
   )
