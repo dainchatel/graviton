@@ -17,7 +17,7 @@ describe('Article Page', () => {
       query: { title: 'Our First Article' },
     })
 
-    render(<ArticlePage stays={[]} articles={mockArticles} />)
+    render(<ArticlePage stays={[]} articles={mockArticles} locations={[]} />)
     
     expect(screen.getByText('Our First Article')).toBeInTheDocument()
     expect(screen.getByText('By Emma Pattiz')).toBeInTheDocument()

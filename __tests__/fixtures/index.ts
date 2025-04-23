@@ -49,6 +49,8 @@ export const mockStays: Stay[] = [
     coordinates: '1, 2',
     location: 'Berlin',
     link: 'fake_link',
+    address: '123 Fake Street',
+    price: '$$',
   },
   {
     id: '2',
@@ -59,6 +61,8 @@ export const mockStays: Stay[] = [
     coordinates: '1, 2',
     location: 'Berlin',
     link: 'fake_link',
+    address: '123 Fake Street',
+    price: '$$',
   },
   {
     id: '3',
@@ -69,6 +73,8 @@ export const mockStays: Stay[] = [
     coordinates: '1, 2',
     location: 'Tokyo',
     link: 'fake_link',
+    address: '123 Fake Street',
+    price: '$$',
   },
   {
     id: '4',
@@ -79,6 +85,8 @@ export const mockStays: Stay[] = [
     coordinates: '1, 2',
     location: 'Tokyo',
     link: 'fake_link',
+    address: '123 Fake Street',
+    price: '$$',
   },
   {
     id: '5',
@@ -89,5 +97,7 @@ export const mockStays: Stay[] = [
     coordinates: '1, 2',
     location: 'Tokyo',
     link: 'fake_link',
+    address: '123 Fake Street',
+    price: '$$',
   },
 ]

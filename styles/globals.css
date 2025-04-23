@@ -1,3 +1,20 @@
+main {
+  padding-bottom: -4rem; 
+}
+
+footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 4rem;
+  width: 100%;
+}
+
 div:hover > .marker-label {
   opacity: 1;
+}
+
+input::placeholder {
+  color: #E0E0E0;
+  font-family: 'Georgia', cursive;
 }

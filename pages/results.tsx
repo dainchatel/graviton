@@ -7,11 +7,12 @@ import { useRouter } from 'next/router'
 
 export async function getServerSideProps() {
   try {
-    const { stays, articles } = await fetchData()
+    const { stays, articles, locations } = await fetchData()
     return {
       props: {
         stays,
         articles,
+        locations,
       },
     }
   } catch (error) {
@@ -25,7 +26,7 @@ export async function getServerSideProps() {
   }
 }
 
-export default function Results({ articles, stays }: Props) {
+export default function Results({ articles, stays, locations }: Props) {
   const router = useRouter()
   const { q } = router.query
 
@@ -67,13 +68,13 @@ export default function Results({ articles, stays }: Props) {
     
   }
   return (
-    <Layout>
+    <Layout locations={locations}>
       { matchingLocations.length ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
           <h1>Locations</h1>
           <div>
             {matchingLocations.map((location: string) => {
-              const href = `/stays?location=${encodeURIComponent(location)}`
+              const href = `/location?name=${encodeURIComponent(location)}`
               return (
                 <div style={{ padding: '2rem', width: '45rem', border: '1px solid black' }} key={location}>
                   <Link style={{
@@ -92,7 +93,7 @@ export default function Results({ articles, stays }: Props) {
           <div>
             {matchingStays.map((stay: Stay) => {
               const anchorId = stay.name.toLowerCase().replace(/\s+/g, '-')
-              const href = `/stays?location=${encodeURIComponent(stay.location)}#${anchorId}`
+              const href = `/location?name=${encodeURIComponent(stay.location)}#${anchorId}`
               return (
                 <div style={{ padding: '2rem', width: '45rem', border: '1px solid black' }} key={stay.id}>
                   <Link style={{

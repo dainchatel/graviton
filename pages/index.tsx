@@ -2,14 +2,17 @@ import Link from 'next/link'
 import Layout from '@/graviton/components/layout'
 import { fetchData } from '@/graviton/lib/data'
 import { Article, Props } from '@/graviton/types'
+import SearchInput from '../components/searchInput'
 
 export async function getServerSideProps() {
   try {
-    const { stays, articles } = await fetchData()
+    const { previewArticles, locations } = await fetchData()
+   
     return {
       props: {
-        stays,
-        articles,
+        stays: [],
+        articles: previewArticles,
+        locations,
       },
     }
   } catch (error) {
@@ -23,75 +26,56 @@ export async function getServerSideProps() {
   }
 }
 
-export default function Home( { stays, articles }: Props) {
-
-  const locationSet = new Set<string>()
-  for (const stay of stays) {
-    locationSet.add(stay.location)
-  }
-  
-  const locations = [...locationSet].sort()
-  const previewArticles = articles.slice(0, 3)
-  
+export default function Home( { articles, locations }: Props) {  
   return (
-    <Layout>
-      <section className='p-4'>
-        <nav style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {locations.map((location: string) => {
-              const href = `/stays?location=${encodeURIComponent(location)}`
+    <Layout locations={locations}>
+      <section style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        flexGrow: '1',
+      }}>
+        <SearchInput/>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center', width: '80vw' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
+            {articles.map((article: Article) => {
+              const href = `/article?title=${encodeURIComponent(article.title)}`
               return (
                 <Link 
+                  key={article.id}
+                  href={href}
                   style={{
                     color: 'black',
-                    fontSize: '3rem',
-                    textDecoration: 'none', 
-                  }} 
-                  href={href} 
-                  key={location}
+                    textDecoration: 'none',
+                  }}
                 >
-                  <strong>{location}</strong>
+                  <div 
+                    style={{ 
+                      margin: '0.5rem 0', 
+                      padding: '2rem', 
+                      maxWidth: '20rem', 
+                      border: '1px solid black', 
+                    }} 
+                  >
+                    <strong>{article.title}</strong>
+                    <p>{article.text.substring(0, 100)}...</p>
+                  </div>
                 </Link>
               )
             })}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {previewArticles.map((article: Article) => {
-              const href = `/article?title=${encodeURIComponent(article.title)}`
-              return (
-                <div 
-                  style={{ 
-                    margin: '1rem 0', 
-                    padding: '2rem', 
-                    maxWidth: '20rem', 
-                    border: '1px solid black', 
-                  }} 
-                  key={article.id}
-                >
-                  <Link 
-                    style={{
-                      color: 'black',
-                      textDecoration: 'none', 
-                    }} 
-                    href={href}
-                  >
-                    <strong>{article.title}</strong>
-                  </Link>
-                  <p>{article.text.substring(0, 100)}...</p>
-                </div>
-              )
-            })}
-            <Link 
-              style={{
-                color: 'black',
-                textDecoration: 'none', 
-              }}  
-              href='/articles'
-            >
-              <strong>View All Articles</strong>
-            </Link>
-          </div>
-        </nav>
+          <Link 
+            style={{
+              color: 'black',
+              marginTop: '1.5rem',
+              textDecoration: 'none', 
+            }}  
+            href='/articles'
+          >
+            <strong>View All</strong>
+          </Link>
+        </div>
       </section>
     </Layout>
   )

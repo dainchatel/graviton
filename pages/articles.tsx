@@ -5,11 +5,12 @@ import { fetchData } from '@/graviton/lib/data'
 
 export async function getServerSideProps() {
   try {
-    const { stays, articles } = await fetchData()
+    const { articles, locations } = await fetchData()
     return {
       props: {
-        stays,
+        stays: [],
         articles,
+        locations,
       },
     }
   } catch (error) {
@@ -23,9 +24,9 @@ export async function getServerSideProps() {
   }
 }
 
-export default function Articles({ articles }: Props) {
+export default function Articles({ articles, locations }: Props) {
   return (
-    <Layout>
+    <Layout locations={locations}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
         {articles.map((article: Article) => {
           const href = `/article?title=${encodeURIComponent(article.title)}`

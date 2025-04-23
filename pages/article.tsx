@@ -6,11 +6,12 @@ import { fetchData } from '@/graviton/lib/data'
 
 export async function getServerSideProps() {
   try {
-    const { stays, articles } = await fetchData()
+    const { articles, locations } = await fetchData()
     return {
       props: {
-        stays,
+        stays: [],
         articles,
+        locations,
       },
     }
   } catch (error) {
@@ -24,7 +25,7 @@ export async function getServerSideProps() {
   }
 }
 
-export default function Article({ articles }: Props) {
+export default function Article({ articles, locations }: Props) {
   const router = useRouter()
   const { title } = router.query
   
@@ -32,14 +33,14 @@ export default function Article({ articles }: Props) {
   
   if (!article) {
     return (
-      <Layout>
+      <Layout locations={locations}>
         <h1>Uh oh, couldn&apos;t find what you were looking for!</h1>
         <p>No article found with title: {title}</p>
       </Layout>
     )
   }
   return (
-    <Layout>
+    <Layout locations={locations}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ padding: '0 2rem 2rem 2rem', maxWidth: '45rem' }} key={article.id}>   
           <h3 style={{ fontSize: '2rem' }}>{article.title}</h3>
@@ -53,7 +54,7 @@ export default function Article({ articles }: Props) {
         <Link style={{ 
           color: 'black', 
           textDecoration: 'none' }}  href='/articles'>
-          <strong>View All Articles</strong>
+          <strong>All Articles</strong>
         </Link>
       </div>
     </Layout>
