@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:mock": "MOCK=true next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -40,6 +41,7 @@
     "@types/react-map-gl": "^6.1.7",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "eslint-plugin-react": "^7.37.5",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "ts-node": "^10.9.2",

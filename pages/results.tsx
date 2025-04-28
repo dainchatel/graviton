@@ -21,6 +21,7 @@ export async function getServerSideProps() {
       props: {
         stays: [],
         articles: [],
+        locations: [],
       },
     }
   }
@@ -35,16 +36,28 @@ export default function Results({ articles, stays, locations }: Props) {
   let matchingArticles: Article[] = []
 
   if (q && typeof q === 'string') {
-    const articleFuse = new Fuse(articles, {
-      keys: ['title', 'text', 'author', 'tags'],
-      threshold: 0.4,
-      includeScore: true,
+    const articleFuseShort = new Fuse(articles, {
+      keys: ['title', 'author', 'tags'],
+      threshold: 0.3,
     })
     
-    const stayFuse = new Fuse(stays, {
-      keys: ['name', 'description', 'location', 'tags'],
+    const articleFuseLong = new Fuse(articles, {
+      keys: ['text'],
+      ignoreLocation: true,
+      threshold: 0.3,
+      minMatchCharLength: 4,
+    })
+    
+    const stayFuseShort = new Fuse(stays, {
+      keys: ['name', 'location', 'tags'],
       threshold: 0.4,
-      includeScore: true,
+    })
+    
+    const stayFuseLong = new Fuse(stays, {
+      keys: ['description'],
+      ignoreLocation: true,
+      threshold: 0.3,
+      minMatchCharLength: 4,
     })
 
     const locationFuse = new Fuse(stays, {
@@ -60,70 +73,100 @@ export default function Results({ articles, stays, locations }: Props) {
     })
     matchingLocations = [...locationSet]
     
-    const staysResult = stayFuse.search(q)
-    matchingStays = staysResult.map(result => result.item)
-    
-    const articlesResult = articleFuse.search(q)
-    matchingArticles = articlesResult.map(result => result.item)
-    
+    const shortStaysResult = stayFuseShort.search(q)
+    const longStaysResult = stayFuseLong.search(q)
+    const staySet = new Set<Stay>()
+    shortStaysResult.forEach(result => {
+      staySet.add(result.item)
+    })
+    longStaysResult.forEach(result => {
+      staySet.add(result.item)
+    })
+    matchingStays = [...staySet]
+
+    const shortArticlesResult = articleFuseShort.search(q)
+    const longArticlesResult = articleFuseLong.search(q)
+    const articleSet = new Set<Article>()
+    shortArticlesResult.forEach(result => {
+      articleSet.add(result.item)
+    })
+    longArticlesResult.forEach(result => {
+      articleSet.add(result.item)
+    })
+    matchingArticles = [...articleSet]
   }
   return (
     <Layout locations={locations}>
-      { matchingLocations.length ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
-          <h1>Locations</h1>
+      {
+        matchingLocations.length ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
+            <h1>Locations</h1>
+            <div>
+              {
+                matchingLocations.map((location: string) => {
+                  const href = `/location?name=${encodeURIComponent(location)}`
+                  return (
+                    <div style={{ padding: '2rem', width: '45rem', border: '1px solid #e0e0e0' }} key={location}>
+                      <Link style={
+                        {
+                          color: 'black',
+                          textDecoration: 'none',
+                          fontSize: '1.5rem' }
+                      } href={href}><strong>{location}</strong></Link>
+                    </div>
+                  )
+                })
+              }
+            </div>
+          </div>) : null
+      }
+      {
+        matchingStays.length ? 
+          (<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
+            <h1>Stays</h1>
+            <div>
+              {
+                matchingStays.map((stay: Stay) => {
+                  const anchorId = stay.name.toLowerCase().replace(/\s+/g, '-')
+                  const href = `/location?name=${encodeURIComponent(stay.location)}#${anchorId}`
+                  return (
+                    <div style={{ padding: '2rem', width: '45rem', border: '1px solid #e0e0e0' }} key={stay.id}>
+                      <Link style={
+                        {
+                          color: 'black',
+                          textDecoration: 'none',
+                          fontSize: '1.5rem' }
+                      } href={href}><strong>{stay.name}</strong></Link>
+                      <p>{stay.location}</p>
+                      <p>{stay.description}</p>
+                    </div>
+                  )})
+              }
+            </div>
+          </div>) : null
+      }
+      {
+        matchingArticles.length ? (<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
+          <h1>Articles</h1>
           <div>
-            {matchingLocations.map((location: string) => {
-              const href = `/location?name=${encodeURIComponent(location)}`
-              return (
-                <div style={{ padding: '2rem', width: '45rem', border: '1px solid black' }} key={location}>
-                  <Link style={{
-                    color: 'black',
-                    textDecoration: 'none',
-                    fontSize: '1.5rem' }} href={href}><strong>{location}</strong></Link>
-                </div>
-              )
-            })}
+            {
+              matchingArticles.map((article: Article) => {
+                const href = `/article?title=${encodeURIComponent(article.title)}`
+                return (
+                  <div style={{ padding: '2rem', width: '45rem', border: '1px solid #e0e0e0' }} key={article.id}>
+                    <Link style={
+                      {
+                        color: 'black',
+                        textDecoration: 'none',
+                        fontSize: '1.5rem' }
+                    } href={href}><strong>{article.title}</strong></Link>
+                    <p>By {article.author}</p>
+                    <p>{article.text.substring(0, 200)}...</p>
+                  </div>
+                )})
+            }
           </div>
         </div>) : null
-      }
-      { matchingStays.length ? 
-        (<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
-          <h1>Stays</h1>
-          <div>
-            {matchingStays.map((stay: Stay) => {
-              const anchorId = stay.name.toLowerCase().replace(/\s+/g, '-')
-              const href = `/location?name=${encodeURIComponent(stay.location)}#${anchorId}`
-              return (
-                <div style={{ padding: '2rem', width: '45rem', border: '1px solid black' }} key={stay.id}>
-                  <Link style={{
-                    color: 'black',
-                    textDecoration: 'none',
-                    fontSize: '1.5rem' }} href={href}><strong>{stay.name}</strong></Link>
-                  <p>{stay.location}</p>
-                  <p>{stay.description}</p>
-                </div>
-              )})}
-          </div>
-        </div>) : null
-      }
-      {matchingArticles.length ? (<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
-        <h1>Articles</h1>
-        <div>
-          {matchingArticles.map((article: Article) => {
-            const href = `/article?title=${encodeURIComponent(article.title)}`
-            return (
-              <div style={{ padding: '2rem', width: '45rem', border: '1px solid black' }} key={article.id}>
-                <Link style={{
-                  color: 'black',
-                  textDecoration: 'none',
-                  fontSize: '1.5rem' }} href={href}><strong>{article.title}</strong></Link>
-                <p>By {article.author}</p>
-                <p>{article.text.substring(0, 200)}...</p>
-              </div>
-            )})}
-        </div>
-      </div>) : null
       }
       <div style={{ height: '5rem' }}></div>
     </Layout>

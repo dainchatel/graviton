@@ -24,6 +24,7 @@ export async function getServerSideProps() {
       props: {
         stays: [],
         articles: [],
+        locations: [],
       },
     }
   }
@@ -84,15 +85,17 @@ export default function Location({ stays, locations }: Props) {
       <Layout locations={locations}>
         <main style={{ display: 'flex', justifyContent: 'space-evenly' }}>
           <div style={{ width: 600 }}>
-            {filteredStays.map((stay, i) => (
-              <Stay 
-                key={i} 
-                index={i}
-                stay={stay}   
-                onInView={debouncedSetSelectedStayIndex}
-                isProgrammaticScroll={isProgrammaticScroll}
-                readyForScrollSync={readyForScrollSync}
-              />))}
+            {
+              filteredStays.map((stay, i) => (
+                <Stay 
+                  key={i} 
+                  index={i}
+                  stay={stay}   
+                  onInView={debouncedSetSelectedStayIndex}
+                  isProgrammaticScroll={isProgrammaticScroll}
+                  readyForScrollSync={readyForScrollSync}
+                />))
+            }
           </div>
           <div>
 

@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom'
 import { fireEvent, render, screen } from '@testing-library/react'
 import Home from '@/graviton/pages'
-import { mockStays, mockArticles } from './fixtures/index'
+import { name } from '@/graviton/constants'
+import { mockStays, mockArticles, mockHome, mockLocations } from './fixtures/index'
 
 const mockPush = jest.fn()
 jest.mock('next/router', () => ({
@@ -19,42 +20,53 @@ describe('Home page', () => {
     mockPush.mockClear()
   })
 
-  it('renders search input and all visible articles', () => {
-    const previewArticles = mockArticles.slice(0, 3)
-    render(<Home stays={mockStays} articles={previewArticles} locations={[]} />)
+  it('renders heading', () => {
+    render(
+      <Home
+        stays={mockStays}
+        articles={mockArticles}
+        locations={mockLocations}
+        home={mockHome}
+      />,
+    )
 
-    // Ensure search input placeholder exists
-    expect(screen.getByPlaceholderText(/search/i)).toBeInTheDocument()
-
-    // Check first 3 article titles render
-    expect(screen.getByText('Our First Article')).toBeInTheDocument()
-    expect(screen.getByText('Second Amazing Article')).toBeInTheDocument()
-    expect(screen.getByText('New Amazing Article')).toBeInTheDocument()
-
-    // Ensure only the last 3 are rendered
-    expect(screen.queryByText('Last Article')).not.toBeInTheDocument()
-
-    // Ensure preview text is included
-    expect(screen.getAllByText(/\.\.\./).length).toBeGreaterThanOrEqual(3)
-
-    // View All link works
-    expect(screen.getByText(/view all/i)).toBeInTheDocument()
+    expect(screen.getByText(name)).toBeInTheDocument()
   })
 
-  it('submits a search query and navigates to results', () => {
-    render(<Home stays={mockStays} articles={mockArticles} locations={[]} />)
+  it('reveals city options when dropdown is clicked', () => {
+    render(
+      <Home
+        stays={mockStays}
+        articles={mockArticles}
+        locations={mockLocations}
+        home={mockHome}
+      />,
+    )
+
+    const dropdownBtn = screen.getByRole('button', { name: /cities/i })
+    fireEvent.click(dropdownBtn)
+
+    mockLocations.forEach(loc =>
+      expect(screen.getByText(loc.name)).toBeInTheDocument(),
+    )
+  })
+
+  it('submits a search query and navigates to /results', () => {
+    render(
+      <Home
+        stays={mockStays}
+        articles={mockArticles}
+        locations={mockLocations}
+        home={mockHome}
+      />,
+    )
 
     const input = screen.getByPlaceholderText(/search/i)
     fireEvent.change(input, { target: { value: 'tokyo' } })
 
-    // Should update value
     expect((input as HTMLInputElement).value).toBe('tokyo')
 
-    const buttons = screen.getAllByRole('button')
-    expect(buttons).toHaveLength(2)
-
-    const form = input.closest('form')!
-    fireEvent.submit(form)
+    fireEvent.submit(input.closest('form') as HTMLFormElement)
 
     expect(mockPush).toHaveBeenCalledWith({
       pathname: '/results',
@@ -62,33 +74,58 @@ describe('Home page', () => {
     })
   })
 
-  it('article cards contain working links with titles', () => {
-    render(<Home stays={mockStays} articles={mockArticles} locations={[]} />)
+  it('renders header article, sub-header tiles, and updated-location tiles', () => {
+    render(
+      <Home
+        stays={mockStays}
+        articles={mockArticles}
+        locations={mockLocations}
+        home={mockHome}
+      />,
+    )
 
-    const hrefs = screen.getAllByRole('link').map(link => link.getAttribute('href'))
+    /* header:true article */
+    expect(
+      screen.getByText(mockArticles.find(article => article.header)?.title ?? 'This will never match'),
+    ).toBeInTheDocument()
+
+    /* all subHeader:true titles appear in the grid */
+    const subHeaderTitles = mockArticles
+      .filter(a => a.subHeader)
+      .map(a => a.title)
+
+    subHeaderTitles.forEach(title =>
+      expect(screen.getByText(title)).toBeInTheDocument(),
+    )
+
+    /* every location that has updatedAt is shown as a tile */
+    const updatedLocations = mockLocations
+      .filter(l => l.updatedAt)
+
+    updatedLocations.forEach(location =>
+      expect(screen.getByText(`Our ${location.numberOfStays} Favorite Stays in ${location.name}`)).toBeInTheDocument(),
+    )
+  })
+
+  it('article cards contain working links', () => {
+    render(
+      <Home
+        stays={mockStays}
+        articles={mockArticles}
+        locations={mockLocations}
+        home={mockHome}
+      />,
+    )
+
+    const hrefs = screen
+      .getAllByRole('link')
+      .map(link => link.getAttribute('href'))
 
     expect(hrefs).toEqual(
       expect.arrayContaining([
         expect.stringMatching(/^\/article\?title=/),
-        '/articles',  
+        '/articles', // View-all link
       ]),
     )
-  })
-
-  it('reveals city options when dropdown is clicked', () => {
-    render(<Home stays={mockStays} articles={mockArticles} locations={[
-      'Tokyo',
-      'Berlin',
-      'Lisbon',
-    ]} />)
-  
-    // Click to open the dropdown
-    const dropdownButton = screen.getByRole('button', { name: /cities/i }) // update "cities" if the label differs
-    fireEvent.click(dropdownButton)
-  
-    // Cities should now appear in the DOM
-    expect(screen.getByText('Tokyo')).toBeInTheDocument()
-    expect(screen.getByText('Berlin')).toBeInTheDocument()
-    expect(screen.getByText('Lisbon')).toBeInTheDocument()
   })
 })

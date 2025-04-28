@@ -20,6 +20,7 @@ export async function getServerSideProps() {
       props: {
         stays: [],
         articles: [],
+        locations: [],
       },
     }
   }
@@ -46,14 +47,18 @@ export default function Article({ articles, locations }: Props) {
           <h3 style={{ fontSize: '2rem' }}>{article.title}</h3>
           <p>By {article.author}</p>
           <p>{article.text}</p>
-          <div>Tags: {article.tags.map((tag: string, i: number) => (
-            <span style={{ color: 'blue' }} key={tag}>{i === 0 ? '' : ', '}{tag}</span>
-          ))}
+          <div>Tags: {
+            article.tags.map((tag: string, i: number) => (
+              <span style={{ color: 'blue' }} key={tag}>{i === 0 ? '' : ', '}{tag}</span>
+            ))
+          }
           </div>
         </div>
-        <Link style={{ 
-          color: 'black', 
-          textDecoration: 'none' }}  href='/articles'>
+        <Link style={
+          { 
+            color: 'black', 
+            textDecoration: 'none' }
+        }  href='/articles'>
           <strong>All Articles</strong>
         </Link>
       </div>

@@ -1,6 +1,7 @@
 import { fetchData } from '@/graviton/lib/data'
 
 describe('fetchData', () => {
+  jest.setTimeout(10_000)
   it('fetches and transforms data from Google Sheets', async () => {
     const { stays, articles } = await fetchData()
 

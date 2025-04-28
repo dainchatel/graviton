@@ -11,7 +11,11 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.config({
-    extends: ['next/core-web-vitals', 'next/typescript'],
+    extends: [
+      'next/core-web-vitals',
+      'next/typescript',
+    ],
+    plugins: ['react'],
     rules: {
       'semi': [2, 'never'],
       'indent': ['error', 2],
@@ -21,6 +25,10 @@ const eslintConfig = [
         'allowAllPropertiesOnSameLine': true,
       }],
       'object-curly-spacing': ['error', 'always'],
+      'react/jsx-curly-newline': ['error', {
+        multiline: 'require',
+        singleline: 'forbid',
+      }],
     },
   }),
 ]

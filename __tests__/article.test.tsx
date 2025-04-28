@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/router'
 import ArticlePage from '@/graviton/pages/article'
-import { mockArticles } from './fixtures'
+import { mockArticles, mockHome } from './fixtures'
 
 
 jest.mock('next/router', () => ({
@@ -14,16 +14,16 @@ describe('Article Page', () => {
   
   it('renders correct article based on title query', () => {
     (useRouter as jest.Mock).mockReturnValue({
-      query: { title: 'Our First Article' },
+      query: { title: 'Berlin in Spring: A Local\'s Guide' },
     })
 
-    render(<ArticlePage stays={[]} articles={mockArticles} locations={[]} />)
+    render(<ArticlePage stays={[]} articles={mockArticles} locations={[]} home={mockHome}/>)
     
-    expect(screen.getByText('Our First Article')).toBeInTheDocument()
-    expect(screen.getByText('By Emma Pattiz')).toBeInTheDocument()
-    expect(screen.getByText('Here is the article text')).toBeInTheDocument()
-    expect(screen.getByText('hello', { exact: false })).toBeInTheDocument()
-    expect(screen.getByText('world', { exact: false })).toBeInTheDocument()
-    expect(screen.queryByText('Second Amazing Article')).not.toBeInTheDocument()
+    expect(screen.getByText('Berlin in Spring: A Local\'s Guide')).toBeInTheDocument()
+    expect(screen.getByText('By John Doe')).toBeInTheDocument()
+    expect(screen.getByText('Berlin transforms the gritty urban landscape', { exact: false })).toBeInTheDocument()
+    expect(screen.getByText('Seasonal', { exact: false })).toBeInTheDocument()
+    expect(screen.getByText('City Life', { exact: false })).toBeInTheDocument()
+    expect(screen.queryByText('Under the Radar in Miami')).not.toBeInTheDocument()
   })
 })

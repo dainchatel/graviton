@@ -19,6 +19,7 @@ export async function getServerSideProps() {
       props: {
         stays: [],
         articles: [],
+        locations: [],
       },
     }
   }
@@ -28,18 +29,22 @@ export default function Articles({ articles, locations }: Props) {
   return (
     <Layout locations={locations}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
-        {articles.map((article: Article) => {
-          const href = `/article?title=${encodeURIComponent(article.title)}`
-          return (
-            <div style={{ padding: '2rem', maxWidth: '45rem', border: '1px solid black' }} key={article.id}>
-              <Link style={{
-                color: 'black',
-                textDecoration: 'none',
-                fontSize: '1.5rem' }} href={href}><strong>{article.title}</strong></Link>
-              <p>By {article.author}</p>
-              <p>{article.text.substring(0, 200)}...</p>
-            </div>
-          )})}
+        {
+          articles.map((article: Article) => {
+            const href = `/article?title=${encodeURIComponent(article.title)}`
+            return (
+              <div style={{ padding: '2rem', maxWidth: '45rem', border: '1px solid #e0e0e0' }} key={article.id}>
+                <Link style={
+                  {
+                    color: 'black',
+                    textDecoration: 'none',
+                    fontSize: '1.5rem' }
+                } href={href}><strong>{article.title}</strong></Link>
+                <p>By {article.author}</p>
+                <p>{article.text.substring(0, 200)}...</p>
+              </div>
+            )})
+        }
       </div>
     </Layout>
   )
