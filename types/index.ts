@@ -21,10 +21,26 @@ export type Article = {
   tags: string[]
   image: string
   header: boolean
+  subHeader: boolean
+}
+
+export type Location = {
+  id: string
+  name: string
+  icon: string
+  numberOfStays: number
+  updatedAt?: string
+}
+
+export type Home = {
+  header: Article
+  subHeaders: Article[]
+  updatedLocations: Location[]
 }
 
 export type Props = {
   stays: Stay[]
   articles: Article[]
-  locations: string[]
+  locations: Location[]
+  home: Home
 }

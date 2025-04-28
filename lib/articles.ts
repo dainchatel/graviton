@@ -8,6 +8,7 @@ const TEXT = 'Text'
 const IMAGE = 'Image'
 const TAGS = 'Tags'
 const HEADER = 'Header'
+const SUBHEADER = 'Subheader'
 
 export const filterRawArticles = (rawStay: GoogleSpreadsheetRow): GoogleSpreadsheetRow =>
   rawStay.get(TITLE) &&
@@ -22,4 +23,5 @@ export const mapRawArticles = (rawArticle: GoogleSpreadsheetRow): Article => ({
   image: rawArticle.get(IMAGE),
   tags: rawArticle.get(TAGS) ? rawArticle.get(TAGS).split(',') : [],
   header: !!rawArticle.get(HEADER),
+  subHeader: !!rawArticle.get(SUBHEADER),
 })

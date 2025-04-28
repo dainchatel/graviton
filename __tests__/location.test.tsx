@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/router'
 import Location from '@/graviton/pages/location'
-import { mockStays } from './fixtures'
+import { mockHome, mockStays, mockLocations } from './fixtures'
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(),
@@ -14,21 +14,46 @@ jest.mock('@/graviton/components/map', () => {
   return MockMap
 })
 
+jest.mock('@/graviton/components/instagramEmbed', () => {
+  const MockInstagramEmbed = () => <div data-testid="mock-instagram-embed" />
+  MockInstagramEmbed.displayName = 'MockInstagramEmbed'
+  return MockInstagramEmbed
+})
+
 describe('Location Page', () => {
-  it('renders location stays from context', () => {
+  it('renders only Tokyo stays', () => {
     (useRouter as jest.Mock).mockReturnValue({
       query: { name: 'Tokyo' },
     })
 
-    render(<Location stays={mockStays} articles={[]} locations={[]} />)
-    // Berlin stays should not be rendered
-    expect(screen.queryByText('The Dolli')).not.toBeInTheDocument()
-    expect(screen.queryByText('The Hyatt')).not.toBeInTheDocument()
+    render(
+      <Location
+        stays={mockStays}
+        articles={[]}
+        locations={mockLocations}
+        home={mockHome}
+      />,
+    )
 
-    // Tokyo stays should be
-    expect(screen.getByText('Great Hotel')).toBeInTheDocument()
-    expect(screen.getByText('Good Hotel')).toBeInTheDocument()
-    expect(screen.getByText('Bright Apartment')).toBeInTheDocument()
+    const tokyoStayNames = mockStays
+      .filter(stay => stay.location === 'Tokyo')
+      .map(stay => stay.name)
+
+    const nonTokyoStayNames = mockStays
+      .filter(stay => stay.location !== 'Tokyo')
+      .map(stay => stay.name)
+
+    // ✅ Should render all Tokyo stays
+    tokyoStayNames.forEach(name => {
+      expect(screen.getByText(name)).toBeInTheDocument()
+    })
+
+    // ❌ Should NOT render non-Tokyo stays
+    nonTokyoStayNames.forEach(name => {
+      expect(screen.queryByText(name)).not.toBeInTheDocument()
+    })
+
+    // ✅ Should display the Tokyo location name somewhere
     expect(screen.getByText('Tokyo')).toBeInTheDocument()
   })
 })

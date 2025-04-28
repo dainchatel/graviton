@@ -1,4 +1,5 @@
 import { Stay as StayType } from '@/graviton/types'
+import { brandColor } from '@/graviton/constants'
 import InstagramEmbed from './instagramEmbed'
 import Link from 'next/link'
 
@@ -36,23 +37,27 @@ export default function Stay({
       <p style={{ margin: '0.2rem' }}>{stay.address}</p>
       <p style={{ margin: '0.2rem' }}>{stay.price}</p>
       <div
-        style={{
-          border: '2px solid #5C2A68',
-          padding: '8px 12px',
-          borderRadius: '4px',
-          marginTop: '0.5rem',
-          display: 'inline-block',
-        }}
+        style={
+          {
+            border: `2px solid ${brandColor}`,
+            padding: '8px 12px',
+            borderRadius: '4px',
+            marginTop: '0.5rem',
+            display: 'inline-block',
+          }
+        }
       >
         <Link
           href={stay.link}
           target="_blank"
           rel="noopener noreferrer"
-          style={{
-            textDecoration: 'none',
-            color: '#5C2A68',
-            fontWeight: 500,
-          }}
+          style={
+            {
+              textDecoration: 'none',
+              color: brandColor,
+              fontWeight: 500,
+            }
+          }
         >
     Website
         </Link>
@@ -60,11 +65,12 @@ export default function Stay({
 
       <br />
       <p>{stay.description}</p>
-      {!!stay.image && (
-        <div style={{ padding: '2rem' }}>
+      {
+        !!stay.image && (<div style={{ padding: '2rem' }}>
           <InstagramEmbed embedHTML={stay.image} />
         </div>
-      )}
+        )
+      }
     </div>
   )
 }
