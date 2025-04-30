@@ -125,7 +125,9 @@ const tokyoStays: Stay[] = [
     tags: ['nightlife', 'views'],
     type: 'airbnb',
     image: 'shibuya_scramble_img_url',
-    description: 'Watch the famous Shibuya Scramble Crossing from your living room window. This bright flat is a nightlife lover\'s dream, offering unbeatable people-watching and direct subway access.',
+    description: 'Perched above the scramble crossing, this light-filled loft is a short stroll from ' +
+    '[teamLab Planets](https://teamlab.art/e/planets/) and only two minutes from ' +
+    '[Harajuku Cat Street](/locations/harajuku-cat-street).',
     coordinates: '35.6595, 139.7005',
     location: 'Tokyo',
     link: 'shibuya_scramble_link',
@@ -167,7 +169,7 @@ const berlinStays: Stay[] = [
     tags: ['modern', 'loft'],
     type: 'airbnb',
     image: 'berlin_loft_img_url',
-    description: 'Located in the heart of Kreuzberg, this stylish loft features exposed brick walls, industrial lighting, and a cozy rooftop terrace. Perfect for creatives and night owls alike, you’ll find music venues, indie bookstores, and organic cafés right outside your door.',
+    description: 'Located in the heart of [Kreuzberg](/articles), this stylish loft features exposed [brick walls](http://espn.com), industrial lighting, and a cozy rooftop terrace. Perfect for creatives and night owls alike, you’ll find music venues, indie bookstores, and organic cafés right outside your door.',
     coordinates: '52.4996, 13.4033',
     location: 'Berlin',
     link: 'berlin_loft_link',

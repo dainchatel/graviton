@@ -21,10 +21,8 @@ jest.mock('@/graviton/components/instagramEmbed', () => {
 })
 
 describe('Location Page', () => {
-  it('renders only Tokyo stays', () => {
-    (useRouter as jest.Mock).mockReturnValue({
-      query: { name: 'Tokyo' },
-    })
+  it('renders only Tokyo stays (and their markdown links)', () => {
+    (useRouter as jest.Mock).mockReturnValue({ query: { name: 'Tokyo' } })
 
     render(
       <Location
@@ -35,25 +33,29 @@ describe('Location Page', () => {
       />,
     )
 
-    const tokyoStayNames = mockStays
-      .filter(stay => stay.location === 'Tokyo')
-      .map(stay => stay.name)
+    // ✅ Tokyo stays appear
+    mockStays
+      .filter(s => s.location === 'Tokyo')
+      .forEach(s => {
+        expect(screen.getByText(s.name)).toBeInTheDocument()
+      })
 
-    const nonTokyoStayNames = mockStays
-      .filter(stay => stay.location !== 'Tokyo')
-      .map(stay => stay.name)
+    // ❌ Non-Tokyo stays do NOT appear
+    mockStays
+      .filter(s => s.location !== 'Tokyo')
+      .forEach(s => {
+        expect(screen.queryByText(s.name)).not.toBeInTheDocument()
+      })
 
-    // ✅ Should render all Tokyo stays
-    tokyoStayNames.forEach(name => {
-      expect(screen.getByText(name)).toBeInTheDocument()
-    })
-
-    // ❌ Should NOT render non-Tokyo stays
-    nonTokyoStayNames.forEach(name => {
-      expect(screen.queryByText(name)).not.toBeInTheDocument()
-    })
-
-    // ✅ Should display the Tokyo location name somewhere
+    // ✅ Location header present
     expect(screen.getByText('Tokyo')).toBeInTheDocument()
+
+    // ✅ Markdown link inside the patched stay renders correctly
+    const teamLabLink = screen.getByRole('link', { name: 'teamLab Planets' })
+    expect(teamLabLink).toBeInTheDocument()
+    expect(teamLabLink).toHaveAttribute(
+      'href',
+      'https://teamlab.art/e/planets/',
+    )
   })
 })
