@@ -1,6 +1,7 @@
 import { Stay as StayType } from '@/graviton/types'
 import { brandColor } from '@/graviton/constants'
 import InstagramEmbed from './instagramEmbed'
+import Markdown from './markdown'
 import Link from 'next/link'
 
 import { useInView } from 'react-intersection-observer'
@@ -64,7 +65,7 @@ export default function Stay({
       </div>
 
       <br />
-      <p>{stay.description}</p>
+      <Markdown value={stay.description} />
       {
         !!stay.image && (<div style={{ padding: '2rem' }}>
           <InstagramEmbed embedHTML={stay.image} />

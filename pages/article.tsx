@@ -1,8 +1,8 @@
-import Layout from '@/graviton/components/layout'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { Layout, Markdown } from '@/graviton/components'
 import { Props } from '@/graviton/types'
-import { fetchData } from '@/graviton/lib/data'
+import { fetchData } from '@/graviton/lib'
 
 export async function getServerSideProps() {
   try {
@@ -46,7 +46,7 @@ export default function Article({ articles, locations }: Props) {
         <div style={{ padding: '0 2rem 2rem 2rem', maxWidth: '45rem' }} key={article.id}>   
           <h3 style={{ fontSize: '2rem' }}>{article.title}</h3>
           <p>By {article.author}</p>
-          <p>{article.text}</p>
+          <Markdown value={article.text} />
           <div>Tags: {
             article.tags.map((tag: string, i: number) => (
               <span style={{ color: 'blue' }} key={tag}>{i === 0 ? '' : ', '}{tag}</span>
