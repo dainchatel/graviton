@@ -1,162 +1,78 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { Home, Location, Article } from '@/graviton/types'
-import * as lucide from 'lucide-react'
+'use client'
+import { useEffect, useState } from 'react'
+import { 
+  LocationTile as LocationTileType, 
+  ArticleTile as ArticleTileType, 
+} from '@/graviton/types'
+import ArticleTile from './articleTile'
+import LocationTile from './locationTile'
 
-export const getIcon = (iconName: string) => {
-  const Icon = lucide[iconName as keyof typeof lucide] as lucide.LucideIcon | undefined
-  if (!Icon) return null
-  return <Icon size={50} />
+type MixedItem =
+  | { type: 'ArticleTile'; data: ArticleTileType }
+  | { type: 'LocationTile'; data: LocationTileType }
+
+type ComponentProps = {
+  articles: ArticleTileType[]
+  locations: LocationTileType[]
 }
 
-const generateArticleTile = (article: Article, header: boolean, image?: string) => {
-  const href = `/article?title=${encodeURIComponent(article.title)}`
+export default function ContentGrid({
+  articles,
+  locations,
+}: ComponentProps) {
+  const [mixedContent, setMixedContent] = useState<MixedItem[]>([])
+
+  useEffect(() => {
+    const sortedLocations = [...locations].sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    )
+
+    const combined: MixedItem[] = [
+      ...articles.map((a) => ({ type: 'ArticleTile' as const, data: a })),
+      ...sortedLocations.map((l) => ({ type: 'LocationTile' as const, data: l })),
+    ]
+
+    // Shuffle
+    for (let i = combined.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[combined[i], combined[j]] = [combined[j], combined[i]]
+    }
+
+    setMixedContent(combined)
+  }, [articles, locations])
+
   return (
-    <Link 
-      key={article.id}
-      href={href}
+    <div
       style={
         {
-          color: 'black',
-          textDecoration: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          width: '80vw',
         }
       }
     >
-      <div style={
-        { 
-          display: 'flex', 
-          border: '1px solid #e0e0e0', 
-          flexDirection: 'row', 
-        }
-      }>
-        {
-          image && <Image
-            src={image}
-            alt="Mock Instagram Post"
-            width='400'
-            height='400'
-          />
-        }
-        <div 
-          style={
-            { 
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              margin: '0.5rem 0', 
-              padding: '2rem', 
-            }
-          } 
-        >
-          <strong>{article.title}</strong>
-          <p style={header ? { width: '60%' } : {}}>{article.text.substring(0, 100)}...</p>
-        </div>
-      </div>
-    </Link>
-  )
-}
-
-const generateUpdatedLocationTile = (location: Location) => {
-  const href = `/location?name=${encodeURIComponent(location.name)}`
-  return (
-    <Link 
-      key={location.id}
-      href={href}
-      style={
-        {
-          color: 'black',
-          textDecoration: 'none',
-          margin: 0,
-        }
-      }
-    >
-      <div 
-        style={
-          { 
-            margin: '0', 
-            padding: '2rem', 
-            border: '1px solid #e0e0e0', 
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-            justifyContent: 'space-evenly',
-            minHeight: '175px',
-          }
-        } 
-      >
-        {getIcon(location.icon)}
-        <p><strong>Our {location.numberOfStays.toString()} Favorite Stays in {location.name}</strong></p>
-        <p style={
-          { 
-            fontStyle: 'italic', margin: 0, 
-          }
-        }>Updated {new Date(location.updatedAt!).toDateString()}</p>
-      </div>
-    </Link>
-  )
-}
-
-export default function ContentGrid({ home }: { home: Home }) {
-  const { header, subHeaders, updatedLocations } = home
-
-  return (
-    <div style={
-      { 
-        display: 'flex', 
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        width: '80vw', 
-      }
-    }>
-      <div style={
-        { 
-          display: 'flex', 
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          alignItems: 'center', 
-        }
-      }>
-        {generateArticleTile(header, true, '/hotel.jpg')}
-      </div>
-      <div style={
-        { 
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '1rem',
-          width: '100%',
-          alignItems: 'stretch',
-          marginTop: '1rem',
-        }
-      }>
-        {subHeaders.map((article: Article) => generateArticleTile(article, false))}
-      </div>
-      <div style={
-        { 
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '1rem',
-          width: '100%',
-          alignItems: 'stretch',
-          marginTop: '1rem',
-        }
-      }>
-        {updatedLocations.map((location: Location) => generateUpdatedLocationTile(location))}
-      </div>
-      <Link 
+      <div
         style={
           {
-            color: 'black',
-            marginTop: '1.5rem',
-            textDecoration: 'none', 
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '1rem',
+            width: '100%',
+            alignItems: 'stretch',
+            marginTop: '1rem',
           }
-        }  
-        href='/articles'
+        }
       >
-        <strong>View All</strong>
-      </Link>
+        {
+          mixedContent.map((item, index) =>
+            item.type === 'ArticleTile'
+              ? (<ArticleTile article={item.data} key={`ArticleTile-${index}`} />)
+              : (<LocationTile location={item.data} key={`LocationTile-${index}`} />),
+          )
+        }
+      </div>
     </div>
   )
 }

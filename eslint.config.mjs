@@ -18,6 +18,7 @@ const eslintConfig = [
     plugins: ['react'],
     rules: {
       'semi': [2, 'never'],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'indent': ['error', 2],
       'comma-dangle': ['error', 'always-multiline'],
       'quotes': ['error', 'single'],

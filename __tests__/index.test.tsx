@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { fireEvent, render, screen } from '@testing-library/react'
 import Home from '@/graviton/pages'
 import { name } from '@/graviton/constants'
-import { mockStays, mockArticles, mockHome, mockLocations } from './fixtures/index'
+import { mockArticles, mockLocations, mockDropdownLocations } from './fixtures/index'
 
 const mockPush = jest.fn()
 jest.mock('next/router', () => ({
@@ -23,10 +23,10 @@ describe('Home page', () => {
   it('renders heading', () => {
     render(
       <Home
-        stays={mockStays}
-        articles={mockArticles}
-        locations={mockLocations}
-        home={mockHome}
+        articleTiles={mockArticles}
+        locationTiles={mockLocations}
+        dropdownLocations={mockDropdownLocations}
+        spotlight={mockArticles[0]}
       />,
     )
 
@@ -36,10 +36,10 @@ describe('Home page', () => {
   it('reveals city options when dropdown is clicked', () => {
     render(
       <Home
-        stays={mockStays}
-        articles={mockArticles}
-        locations={mockLocations}
-        home={mockHome}
+        articleTiles={mockArticles}
+        locationTiles={mockLocations}
+        dropdownLocations={mockDropdownLocations}
+        spotlight={mockArticles[0]}
       />,
     )
 
@@ -54,10 +54,10 @@ describe('Home page', () => {
   it('submits a search query and navigates to /results', () => {
     render(
       <Home
-        stays={mockStays}
-        articles={mockArticles}
-        locations={mockLocations}
-        home={mockHome}
+        articleTiles={mockArticles}
+        locationTiles={mockLocations}
+        dropdownLocations={mockDropdownLocations}
+        spotlight={mockArticles[0]}
       />,
     )
 
@@ -77,21 +77,21 @@ describe('Home page', () => {
   it('renders header article, sub-header tiles, and updated-location tiles', () => {
     render(
       <Home
-        stays={mockStays}
-        articles={mockArticles}
-        locations={mockLocations}
-        home={mockHome}
+        articleTiles={mockArticles}
+        locationTiles={mockLocations}
+        dropdownLocations={mockDropdownLocations}
+        spotlight={mockArticles[0]}
       />,
     )
 
     /* header:true article */
     expect(
-      screen.getByText(mockArticles.find(article => article.header)?.title ?? 'This will never match'),
+      screen.getByText(mockArticles.find(article => article.spotlight)?.title ?? 'This will never match'),
     ).toBeInTheDocument()
 
     /* all subHeader:true titles appear in the grid */
     const subHeaderTitles = mockArticles
-      .filter(a => a.subHeader)
+      .filter(a => a.feature)
       .map(a => a.title)
 
     subHeaderTitles.forEach(title =>
@@ -110,10 +110,10 @@ describe('Home page', () => {
   it('article cards contain working links', () => {
     render(
       <Home
-        stays={mockStays}
-        articles={mockArticles}
-        locations={mockLocations}
-        home={mockHome}
+        articleTiles={mockArticles}
+        locationTiles={mockLocations}
+        dropdownLocations={mockDropdownLocations}
+        spotlight={mockArticles[0]}
       />,
     )
 
@@ -123,8 +123,7 @@ describe('Home page', () => {
 
     expect(hrefs).toEqual(
       expect.arrayContaining([
-        expect.stringMatching(/^\/article\?title=/),
-        '/articles', // View-all link
+        expect.stringMatching(/^\/articles\/[\w-]+/), // dynamic article URLs
       ]),
     )
   })

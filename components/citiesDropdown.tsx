@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { Location } from '@/graviton/types'
+import { DropdownLocation } from '@/graviton/types'
 
-export default function CitiesDropdown({ locations = [] }: {
-  locations: Location[]
-}) {
+type ComponentProps = {
+  dropdownLocations: DropdownLocation[]
+}
+
+export default function CitiesDropdown({ dropdownLocations = [] }: ComponentProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
 
@@ -79,10 +81,10 @@ export default function CitiesDropdown({ locations = [] }: {
               }
             }>
               {
-                locations.map(({ name }, index) => (
+                dropdownLocations.map(({ name, id }, index) => (
                   <Link
                     key={index}
-                    href={`/location?name=${encodeURIComponent(name)}`}
+                    href={`/locations/${id}`}
                     passHref
                     style={
                       {
@@ -99,6 +101,23 @@ export default function CitiesDropdown({ locations = [] }: {
                   </Link>
                 ))
               }
+              <Link
+                key={dropdownLocations.length + 1}
+                href={'/locations'}
+                passHref
+                style={
+                  {
+                    color: '#374151',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    textDecoration: 'none',
+                    display: 'block',
+                  }
+                }
+                onClick={() => setIsOpen(false)}
+              >
+                All
+              </Link>
             </div>
           </div>
         )

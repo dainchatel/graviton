@@ -17,3 +17,9 @@ input::placeholder {
   color: #E0E0E0;
   font-family: 'Georgia', cursive;
 }
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

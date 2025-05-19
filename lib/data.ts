@@ -1,9 +1,9 @@
 import { mockArticles, mockStays, mockLocations } from '@/graviton/__tests__/fixtures'
 import { filterRawArticles, mapRawArticles } from './articles'
-import { filterRawLocations, mapRawLocations } from './locations'
+import { asDropdownLocation, filterRawLocations, mapRawLocations } from './locations'
 import { fetchFromGoogleAPI } from './google'
 import { filterRawStays, mapRawStays } from './stays'
-import { Article, Home, Stay, Location, Props } from '@/graviton/types'
+import { Article, Stay, Location, Props } from '@/graviton/types'
 
 const STAYS = 'Stays'
 const ARTICLES = 'Articles'
@@ -13,7 +13,6 @@ export const fetchData = async (): Promise<Props> => {
   let articles: Article[] = []
   let stays: Stay[] = []
   let tempLocations: Omit<Location, 'numberOfStays'>[] = []
-
   if (process.env.MOCK) {
     articles = mockArticles
     stays = mockStays
@@ -47,27 +46,15 @@ export const fetchData = async (): Promise<Props> => {
     }
   }
 
-  const updatedLocations = locations.filter(location => !!location.updatedAt)
-
-  const header = articles.find(article => !!article.header)
-
-  if (!header) {
-    throw new Error('No header article')
-  }
-
-  const subHeaders = articles.filter(article => !!article.subHeader)
-
-  const home: Home = {
-    header,
-    subHeaders,
-    updatedLocations,
-  }
+  const dropdownLocations = locations
+    .filter(location => location.dropdown)
+    .map(asDropdownLocation)
 
   return {
     stays,
     articles,
     locations,
-    home,
+    dropdownLocations,
   }
 }
 

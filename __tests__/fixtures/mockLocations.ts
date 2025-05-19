@@ -1,32 +1,56 @@
+import { asDropdownLocation, asLocationTile } from '@/graviton/lib/locations'
 import { Location } from '@/graviton/types'
-import { randomUUID } from 'crypto'
 
 export const mockLocations: Location[] = [
   {
-    id: randomUUID(),
+    id: 'tokyo',
     name: 'Tokyo',
     icon: 'Sun',
     updatedAt: '2025-04-22',
     numberOfStays: 12,
+    description: '',
+    dropdown: true,
+    portraitImage: null,
+    landscapeImage: null,
   },
   {
-    id: randomUUID(),
+    id: 'berlin',
     name: 'Berlin',
     icon: 'Building2',
     updatedAt: '2025-04-20',
     numberOfStays: 11,
+    description: '',
+    dropdown: true,
+    portraitImage: null,
+    landscapeImage: null,
   },
   {
-    id: randomUUID(),
+    id: 'lisbon',
     name: 'Lisbon',
     icon: 'Waves',
     updatedAt: '2025-04-18',
     numberOfStays: 10,
+    description: '',
+    dropdown: true,
+    portraitImage: null,
+    landscapeImage: null,
   },
   {
-    id: randomUUID(),
+    id: 'miami',
     name: 'Miami',
-    icon: 'PalmTree',
+    icon: 'TreePalm',
+    updatedAt: '2025-04-02',
     numberOfStays: 13,
+    description: '',
+    dropdown: true,
+    portraitImage: null,
+    landscapeImage: null,
   },
 ]
+
+export const mockDropdownLocations = mockLocations
+  .filter(location => location.dropdown)
+  .map(asDropdownLocation)
+
+export const mockLocationTiles = mockLocations
+  .map(asLocationTile)

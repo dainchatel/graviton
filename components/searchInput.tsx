@@ -5,10 +5,13 @@ import { brandColor } from '@/graviton/constants'
 
 export default function SearchInput () {
   const [query, setQuery] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
   const router = useRouter()
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setIsLoading(true)
     router.push({
       pathname: '/results',
       query: { q: query },
@@ -72,16 +75,36 @@ export default function SearchInput () {
                 border: 'none',
                 borderRadius: '9999px',
                 padding: '0.75rem 1.1rem',
-                cursor: 'pointer',
+                cursor: isLoading ? 'default' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
+                opacity: isLoading ? 0.6 : 1,
               }
             }
+            disabled={isLoading}
           >
-            <Plane size={20} color="white" />
+            {
+              isLoading ? (
+                <div
+                  style={
+                    {
+                      width: 18,
+                      height: 18,
+                      border: '2px solid white',
+                      borderTop: '2px solid transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 0.8s linear infinite',
+                    }
+                  }
+                />
+              ) : (
+                <Plane size={20} color="white" />
+              )
+            }
           </button>
+
         </div>
       </form>
     </div>

@@ -8,39 +8,43 @@ export type Stay = {
   address: string
   price: string
   coordinates: string
-  image?: string
-  tags?: string[]
-  score?: string
+  instagramEmbed: string | null
 }
 
 export type Article = {
   id: string
   title: string
   author: string
+  description: string
   text: string
-  tags: string[]
-  image: string
-  header: boolean
-  subHeader: boolean
+  spotlight: boolean
+  feature: boolean
+  updatedAt: string
+  landscapeImage: string | null
+  portraitImage: string | null
 }
+
+export type ArticleTile = Omit<Article, 'text'>
 
 export type Location = {
   id: string
   name: string
   icon: string
+  description: string
+  dropdown: boolean
+  updatedAt: string
   numberOfStays: number
-  updatedAt?: string
+  landscapeImage: string | null
+  portraitImage: string | null
 }
 
-export type Home = {
-  header: Article
-  subHeaders: Article[]
-  updatedLocations: Location[]
-}
+export type LocationTile = Omit<Location, 'description'>
+
+export type DropdownLocation = Pick<Location, 'id' | 'name'>
 
 export type Props = {
   stays: Stay[]
   articles: Article[]
   locations: Location[]
-  home: Home
+  dropdownLocations: DropdownLocation[]
 }

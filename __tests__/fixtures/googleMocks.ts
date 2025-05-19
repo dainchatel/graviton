@@ -5,37 +5,41 @@ export const createMockGoogleRow = (fields: Record<string, any>) => ({
 
 export const mockGoogleStays = [
   createMockGoogleRow({
+    ID: 'tokyo-tower',
     Name: 'Tokyo Tower Hotel',
     Location: 'Tokyo',
-    Description: 'Great hotel near Tokyo Tower.',
-    Type: 'Hotel',
     Coordinates: '35.6586, 139.7454',
     Address: '4-2-8 Shibakoen, Minato City, Tokyo',
+    Type: 'Hotel',
     Price: '$$$',
-    Image: 'tokyo_tower_image',
-    Tags: 'landmark view,luxury',
+    Description: 'Great hotel near Tokyo Tower.',
     Link: 'https://tokyo-tower-hotel.example.com',
-    Score: '4.8',
+    'Instagram Embed': 'tokyo_tower_image',
   }),
 ]
 
 export const mockGoogleArticles = [
   createMockGoogleRow({
+    ID: 'hidden-tokyo',
     Title: 'Exploring Hidden Tokyo',
     Author: 'Jem Doe',
+    Description: 'Discover Tokyo\'s hidden neighborhoods.',
     Text: 'Discover Tokyo\'s hidden neighborhoods.',
-    Image: 'tokyo_hidden_image',
-    Tags: 'Tokyo,Hidden Gems',
-    Header: true,
-    Subheader: false,
+    'Landscape Image': 'tokyo_hidden_image',
+    'Portrait Image': 'tokyo_hidden_image',
+    Spotlight: true,
+    Date: '02/24/2025',
   }),
 ]
 
 export const mockGoogleLocations = [
   createMockGoogleRow({
+    ID: 'tokyo',
     Name: 'Tokyo',
     Icon: 'Sun',
-    UpdatedAt: '2025-04-22',
+    Description: 'A megacity with amazing food, wine, and music.',
+    Dropdown: true,
+    Date: '12/20/2024',
   }),
 ]
 

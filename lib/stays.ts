@@ -1,20 +1,19 @@
-import { randomUUID } from 'crypto'
 import { Stay } from '@/graviton/types'
 import { GoogleSpreadsheetRow } from 'google-spreadsheet'
 
+const ID = 'ID'
 const NAME = 'Name'
 const LOCATION = 'Location'
 const DESCRIPTION = 'Description'
 const TYPE = 'Type'
 const COORDINATES = 'Coordinates'
-const IMAGE = 'Image'
-const TAGS = 'Tags'
+const INSTAGRAM_EMBED = 'Instagram Embed'
 const LINK = 'Link'
-const SCORE = 'Score'
 const PRICE = 'Price'
 const ADDRESS = 'Address'
 
 export const filterRawStays = (rawStay: GoogleSpreadsheetRow): GoogleSpreadsheetRow =>
+  rawStay.get(ID) &&
   rawStay.get(NAME) &&
   rawStay.get(LOCATION) &&
   rawStay.get(DESCRIPTION) &&
@@ -25,7 +24,7 @@ export const filterRawStays = (rawStay: GoogleSpreadsheetRow): GoogleSpreadsheet
 
 
 export const mapRawStays = (rawStay: GoogleSpreadsheetRow): Stay => ({
-  id: randomUUID(),
+  id: rawStay.get(ID),
   name: rawStay.get(NAME),
   location: rawStay.get(LOCATION),
   description: rawStay.get(DESCRIPTION),
@@ -33,14 +32,6 @@ export const mapRawStays = (rawStay: GoogleSpreadsheetRow): Stay => ({
   coordinates: rawStay.get(COORDINATES),
   address: rawStay.get(ADDRESS),
   price: rawStay.get(PRICE),
-  image: rawStay.get(IMAGE) ?? null,
-  tags: rawStay.get(TAGS) ? rawStay.get('Tags').split(',') : [],
+  instagramEmbed: rawStay.get(INSTAGRAM_EMBED) ?? null,
   link: rawStay.get(LINK),
-  score: rawStay.get(SCORE) ?? null,
 })
-
-export type Location = {
-  name: string
-  latitude: number
-  longitude: number
-}
