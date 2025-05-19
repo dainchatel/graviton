@@ -1,58 +1,44 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { useRouter } from 'next/router'
-import ArticlePage from '@/graviton/pages/article'
-import { mockArticles, mockHome } from './fixtures'
+import ArticlePage from '@/graviton/pages/articles/[articleId]'
+import { mockArticles } from './fixtures'
 
-jest.mock('next/router', () => ({
-  useRouter: jest.fn(),
-}))
-
-describe('Article Page', () => {
-  it('renders correct article based on title query and displays markdown links', () => {
-    (useRouter as jest.Mock).mockReturnValue({
-      query: { title: 'Berlin in Spring: A Local\'s Guide' },
-    })
-
+describe('Article Page – Hidden Tokyo', () => {
+  it('renders article title, author, and markdown links', () => {
     render(
       <ArticlePage
-        stays={[]}
-        articles={mockArticles}
-        locations={[]}
-        home={mockHome}
+        article={mockArticles[0]}
+        dropdownLocations={[]}
       />,
     )
 
-    // headline, by-line & tags still render
     expect(
-      screen.getByText('Berlin in Spring: A Local\'s Guide'),
+      screen.getByText('Exploring Hidden Tokyo'),
     ).toBeInTheDocument()
-    expect(screen.getByText('By John Doe')).toBeInTheDocument()
-    expect(
-      screen.getByText('Berlin transforms the gritty urban landscape', {
-        exact: false,
-      }),
-    ).toBeInTheDocument()
-    expect(screen.getByText('City Life', { exact: false })).toBeInTheDocument()
-    expect(
-      screen.queryByText('Under the Radar in Miami'),
-    ).not.toBeInTheDocument()
+    expect(screen.getByText('By Jem Doe')).toBeInTheDocument()
 
-    // new: markdown links are rendered as anchors with correct hrefs
-    const mauerparkLink = screen.getByRole('link', { name: 'Mauerpark' })
-    expect(mauerparkLink).toBeInTheDocument()
-    expect(mauerparkLink).toHaveAttribute(
-      'href',
-      'https://www.berliner-stadtpark.de/mauerpark',
+    // Check markdown-rendered links
+    const alleywaysLink = screen.getByRole('link', { name: 'alleyways' })
+    expect(alleywaysLink).toHaveAttribute('href', '/')
+
+    const tokyoOftenLink = screen.getByRole('link', { name: 'Tokyo often' })
+    expect(tokyoOftenLink).toHaveAttribute('href', 'http://google.com')
+
+    // Check presence of fallback link
+    const allArticlesLink = screen.getByRole('link', { name: 'All Articles' })
+    expect(allArticlesLink).toHaveAttribute('href', '/articles')
+  })
+
+  it('renders fallback when article is undefined', () => {
+    render(
+      <ArticlePage
+        article={undefined}
+        dropdownLocations={[]}
+      />,
     )
 
-    const brandenburgLink = screen.getByRole('link', {
-      name: 'Brandenburg Gate',
-    })
-    expect(brandenburgLink).toBeInTheDocument()
-    expect(brandenburgLink).toHaveAttribute(
-      'href',
-      '/locations/berlin-brandenburg-gate',
-    )
+    expect(
+      screen.getByText('Uh oh, couldn\'t find what you were looking for!'),
+    ).toBeInTheDocument()
   })
 })

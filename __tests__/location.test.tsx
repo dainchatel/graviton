@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/router'
-import Location from '@/graviton/pages/location'
-import { mockHome, mockStays, mockLocations } from './fixtures'
+import Location from '@/graviton/pages/locations/[locationId]'
+import { mockStays, mockLocations } from './fixtures'
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(),
@@ -26,10 +26,9 @@ describe('Location Page', () => {
 
     render(
       <Location
-        stays={mockStays}
-        articles={[]}
-        locations={mockLocations}
-        home={mockHome}
+        stays={mockStays.filter(stay => stay.location === 'Tokyo')}
+        location={mockLocations[0]}
+        dropdownLocations={[]}
       />,
     )
 
@@ -48,7 +47,7 @@ describe('Location Page', () => {
       })
 
     // ✅ Location header present
-    expect(screen.getByText('Tokyo')).toBeInTheDocument()
+    expect(screen.getByText('Our 12 Favorite Stays in Tokyo')).toBeInTheDocument()
 
     // ✅ Markdown link inside the patched stay renders correctly
     const teamLabLink = screen.getByRole('link', { name: 'teamLab Planets' })

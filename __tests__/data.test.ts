@@ -2,7 +2,7 @@ jest.mock('@/graviton/lib/google', () => ({
   fetchFromGoogleAPI: jest.fn(),
 }))
 
-import { fetchData } from '@/graviton/lib'
+import { fetchData } from '@/graviton/lib/data'
 import { fetchFromGoogleAPI } from '@/graviton/lib/google'
 import { 
   mockArticles, 
@@ -27,8 +27,7 @@ describe('fetchData', () => {
     expect(result.stays).toEqual(mockStays)
     expect(result.articles).toEqual(mockArticles)
     expect(result.locations.length).toBeGreaterThan(0)
-    expect(result.home.header).toEqual(expect.objectContaining({ header: true }))
-    expect(Array.isArray(result.home.subHeaders)).toBe(true)
+    expect(result.dropdownLocations.length).toBeGreaterThan(0)
   })
 
   it('fetches and processes data from Google API if MOCK env is not set', async () => {
@@ -46,19 +45,6 @@ describe('fetchData', () => {
     expect(result.stays.length).toBeGreaterThan(0)
     expect(result.articles.length).toBeGreaterThan(0)
     expect(result.locations.length).toBeGreaterThan(0)
-    expect(result.home.header).toBeDefined()
-    expect(Array.isArray(result.home.subHeaders)).toBe(true)
-  })
-
-  it('throws an error if no header article is found', async () => {
-    (fetchFromGoogleAPI as jest.Mock).mockResolvedValue(
-      mockGoogleSheets({
-        stays: mockGoogleStays,
-        articles: [], // no articles => no header
-        locations: mockGoogleLocations,
-      }),
-    )
-
-    await expect(fetchData()).rejects.toThrow('No header article')
+    expect(result.dropdownLocations.length).toBeGreaterThan(0)
   })
 })

@@ -1,25 +1,104 @@
-import { Article, Props, Stay } from '@/graviton/types'
-import Layout from '@/graviton/components/layout'
-import Link from 'next/link'
+import { Article, Location, Stay, DropdownLocation, ArticleTile, LocationTile } from '@/graviton/types'
+import { Layout, ContentGrid, SearchInput } from '@/graviton/components'
 import Fuse from 'fuse.js'
 import { fetchData } from '@/graviton/lib/data'
-import { useRouter } from 'next/router'
+import { GetServerSidePropsContext } from 'next'
+import { asLocationTile } from '../lib/locations'
+import { asArticleTile } from '../lib/articles'
 
-export async function getServerSideProps() {
+type PageProps = {
+  dropdownLocations: DropdownLocation[]
+  articles: ArticleTile[]
+  locations: LocationTile[]
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{ props: PageProps }> {
   try {
-    const { stays, articles, locations } = await fetchData()
+    const { stays, articles, locations, dropdownLocations } = await fetchData()
+    const { q } = context.query
+
+    let matchingLocations: LocationTile[] = []
+    let matchingStays: Stay[] = []
+    let matchingArticles: ArticleTile[] = []
+  
+    if (q && typeof q === 'string') {
+      const articleFuseShort = new Fuse(articles, {
+        keys: ['title', 'author', 'tags'],
+        threshold: 0.3,
+      })
+      
+      const articleFuseLong = new Fuse(articles, {
+        keys: ['text'],
+        ignoreLocation: true,
+        threshold: 0.3,
+        minMatchCharLength: 4,
+      })
+      
+      const stayFuseShort = new Fuse(stays, {
+        keys: ['name', 'location', 'tags'],
+        threshold: 0.4,
+      })
+      
+      const stayFuseLong = new Fuse(stays, {
+        keys: ['description'],
+        ignoreLocation: true,
+        threshold: 0.3,
+        minMatchCharLength: 4,
+      })
+  
+      const locationFuse = new Fuse(stays, {
+        keys: ['location'],
+        threshold: 0.4,
+        includeScore: true,
+      })
+  
+      const locationsResult = locationFuse.search(q)
+      const locationSet = new Set<Location>()
+      locationsResult.forEach(result => {
+        const location = locations.find(location => location.name === result.item.location)
+        if (location) {
+          locationSet.add(location)
+        }
+      })
+      matchingLocations = [...locationSet].map(asLocationTile)
+      
+      const shortStaysResult = stayFuseShort.search(q)
+      const longStaysResult = stayFuseLong.search(q)
+      const staySet = new Set<Stay>()
+      shortStaysResult.forEach(result => {
+        staySet.add(result.item)
+      })
+      longStaysResult.forEach(result => {
+        staySet.add(result.item)
+      })
+      matchingStays = [...staySet]
+  
+      const shortArticlesResult = articleFuseShort.search(q)
+      const longArticlesResult = articleFuseLong.search(q)
+      const articleSet = new Set<Article>()
+      shortArticlesResult.forEach(result => {
+        articleSet.add(result.item)
+      })
+      longArticlesResult.forEach(result => {
+        articleSet.add(result.item)
+      })
+      matchingArticles = [...articleSet].map(asArticleTile)
+  
+      console.log(matchingStays)
+    }
+
     return {
       props: {
-        stays,
-        articles,
-        locations,
+        dropdownLocations,
+        articles: matchingArticles,
+        locations: matchingLocations,
       },
     }
   } catch (error) {
     console.error('Fetch error:', error)
     return {
       props: {
-        stays: [],
+        dropdownLocations: [],
         articles: [],
         locations: [],
       },
@@ -27,148 +106,57 @@ export async function getServerSideProps() {
   }
 }
 
-export default function Results({ articles, stays, locations }: Props) {
-  const router = useRouter()
-  const { q } = router.query
+export default function Results({ articles, locations, dropdownLocations  }: PageProps) {
 
-  let matchingLocations: string[] = []
-  let matchingStays: Stay[] = []
-  let matchingArticles: Article[] = []
-
-  if (q && typeof q === 'string') {
-    const articleFuseShort = new Fuse(articles, {
-      keys: ['title', 'author', 'tags'],
-      threshold: 0.3,
-    })
-    
-    const articleFuseLong = new Fuse(articles, {
-      keys: ['text'],
-      ignoreLocation: true,
-      threshold: 0.3,
-      minMatchCharLength: 4,
-    })
-    
-    const stayFuseShort = new Fuse(stays, {
-      keys: ['name', 'location', 'tags'],
-      threshold: 0.4,
-    })
-    
-    const stayFuseLong = new Fuse(stays, {
-      keys: ['description'],
-      ignoreLocation: true,
-      threshold: 0.3,
-      minMatchCharLength: 4,
-    })
-
-    const locationFuse = new Fuse(stays, {
-      keys: ['location'],
-      threshold: 0.4,
-      includeScore: true,
-    })
-
-    const locationsResult = locationFuse.search(q)
-    const locationSet = new Set<string>()
-    locationsResult.forEach(result => {
-      locationSet.add(result.item.location)
-    })
-    matchingLocations = [...locationSet]
-    
-    const shortStaysResult = stayFuseShort.search(q)
-    const longStaysResult = stayFuseLong.search(q)
-    const staySet = new Set<Stay>()
-    shortStaysResult.forEach(result => {
-      staySet.add(result.item)
-    })
-    longStaysResult.forEach(result => {
-      staySet.add(result.item)
-    })
-    matchingStays = [...staySet]
-
-    const shortArticlesResult = articleFuseShort.search(q)
-    const longArticlesResult = articleFuseLong.search(q)
-    const articleSet = new Set<Article>()
-    shortArticlesResult.forEach(result => {
-      articleSet.add(result.item)
-    })
-    longArticlesResult.forEach(result => {
-      articleSet.add(result.item)
-    })
-    matchingArticles = [...articleSet]
-  }
   return (
-    <Layout locations={locations}>
-      {
-        matchingLocations.length ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
-            <h1>Locations</h1>
-            <div>
+    <Layout dropdownLocations={dropdownLocations}>
+      <div>
+        {
+          locations.length
+            ? <div style={
               {
-                matchingLocations.map((location: string) => {
-                  const href = `/location?name=${encodeURIComponent(location)}`
-                  return (
-                    <div style={{ padding: '2rem', width: '45rem', border: '1px solid #e0e0e0' }} key={location}>
-                      <Link style={
-                        {
-                          color: 'black',
-                          textDecoration: 'none',
-                          fontSize: '1.5rem' }
-                      } href={href}><strong>{location}</strong></Link>
-                    </div>
-                  )
-                })
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                alignItems: 'center',
               }
+            }>
+              <h1>Cities</h1>
+              <ContentGrid locations={locations} articles={[]} />
             </div>
-          </div>) : null
-      }
-      {
-        matchingStays.length ? 
-          (<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
-            <h1>Stays</h1>
-            <div>
+            : null
+        }
+        {
+          articles.length
+            ? <div style={
               {
-                matchingStays.map((stay: Stay) => {
-                  const anchorId = stay.name.toLowerCase().replace(/\s+/g, '-')
-                  const href = `/location?name=${encodeURIComponent(stay.location)}#${anchorId}`
-                  return (
-                    <div style={{ padding: '2rem', width: '45rem', border: '1px solid #e0e0e0' }} key={stay.id}>
-                      <Link style={
-                        {
-                          color: 'black',
-                          textDecoration: 'none',
-                          fontSize: '1.5rem' }
-                      } href={href}><strong>{stay.name}</strong></Link>
-                      <p>{stay.location}</p>
-                      <p>{stay.description}</p>
-                    </div>
-                  )})
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                alignItems: 'center',
               }
+            }>
+              <h1>Articles</h1>
+              <ContentGrid locations={[]} articles={articles} />
             </div>
-          </div>) : null
-      }
-      {
-        matchingArticles.length ? (<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
-          <h1>Articles</h1>
-          <div>
-            {
-              matchingArticles.map((article: Article) => {
-                const href = `/article?title=${encodeURIComponent(article.title)}`
-                return (
-                  <div style={{ padding: '2rem', width: '45rem', border: '1px solid #e0e0e0' }} key={article.id}>
-                    <Link style={
-                      {
-                        color: 'black',
-                        textDecoration: 'none',
-                        fontSize: '1.5rem' }
-                    } href={href}><strong>{article.title}</strong></Link>
-                    <p>By {article.author}</p>
-                    <p>{article.text.substring(0, 200)}...</p>
-                  </div>
-                )})
-            }
-          </div>
-        </div>) : null
-      }
-      <div style={{ height: '5rem' }}></div>
+            : null
+        }
+        {
+          !locations.length && !articles.length
+            ? <div style={
+              {
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }
+            }>
+              <h1>Sorry, no results. Try another search!</h1>
+              <SearchInput/>
+            </div>
+            : null
+        }
+      </div>
     </Layout>
   )
 }

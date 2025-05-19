@@ -2,9 +2,14 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { name, brandColor } from '@/graviton/constants'
 import CitiesDropdown from './citiesDropdown'
-import { Location } from '@/graviton/types'
+import { DropdownLocation } from '@/graviton/types'
 
-export default function Layout({ children, locations }: { children: React.ReactNode, locations: Location[] }) {
+type ComponentProps = {
+  children: React.ReactNode, 
+  dropdownLocations: DropdownLocation[]
+}
+
+export default function Layout({ children, dropdownLocations }: ComponentProps) {
   return (
     <div style={
       { 
@@ -34,7 +39,7 @@ export default function Layout({ children, locations }: { children: React.ReactN
           <div style={{ fontSize: '1.23rem', fontWeight: 'normal', fontStyle: 'italic' }}>No commissions, no AI — just our favorite places to stay</div>
         </h1>
         <div style={{ margin: '0 3rem 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <CitiesDropdown locations={locations}/>
+          <CitiesDropdown dropdownLocations={dropdownLocations}/>
         </div>
       </header>
       <main style={

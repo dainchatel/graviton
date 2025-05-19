@@ -67,8 +67,8 @@ export default function Stay({
       <br />
       <Markdown value={stay.description} />
       {
-        !!stay.image && (<div style={{ padding: '2rem' }}>
-          <InstagramEmbed embedHTML={stay.image} />
+        !!stay.instagramEmbed && (<div style={{ padding: '2rem' }}>
+          <InstagramEmbed embedHTML={stay.instagramEmbed} />
         </div>
         )
       }
