@@ -20,6 +20,7 @@ export type Article = {
   spotlight: boolean
   feature: boolean
   updatedAt: string
+  locations: string[]
   landscapeImage: string | null
   portraitImage: string | null
 }

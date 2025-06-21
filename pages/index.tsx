@@ -50,7 +50,9 @@ export default function Home(props: PageProps) {
       }>
         <SearchInput/>
         {/* <Spotlight article={props.spotlight} /> */}
-        <ContentGrid articles={props.articleTiles} locations={props.locationTiles} />
+        <div style={{ width: '80vw' }}>
+          <ContentGrid articles={props.articleTiles} locations={props.locationTiles} />
+        </div>
       </section>
     </Layout>
   )
