@@ -1,5 +1,5 @@
 import { DropdownLocation, LocationTile } from '@/graviton/types'
-import { ContentGrid, Layout } from '@/graviton/components'
+import { ContentGrid, Layout, SearchInput } from '@/graviton/components'
 import { fetchData } from '@/graviton/lib/data'
 import { asLocationTile } from '@/graviton/lib/locations'
 
@@ -34,14 +34,20 @@ export async function getServerSideProps(): Promise<{ props: PageProps }> {
 export default function Locations({ dropdownLocations, locations }: PageProps) {
   return (
     <Layout dropdownLocations={dropdownLocations}>
-      <div style={
+      <section style={
         {
           display: 'flex',
-          justifyContent: 'center',
+          flexDirection: 'column',
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+          flexGrow: '1',
         }
       }>
-        <ContentGrid articles={[]} locations={locations}/>
-      </div>
+        <SearchInput/>
+        <div style={{ width: '80vw' }}>
+          <ContentGrid articles={[]} locations={locations} sortBy="alphabetical" />
+        </div>
+      </section>
     </Layout>
   )
 }

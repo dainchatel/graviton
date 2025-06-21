@@ -6,6 +6,7 @@ const TITLE = 'Title'
 const AUTHOR = 'Author'
 const DESCRIPTION = 'Description'
 const TEXT = 'Text'
+const LOCATIONS = 'Locations'
 const SPOTLIGHT = 'Spotlight'
 const FEATURE = 'Feature'
 const DATE = 'Date'
@@ -29,6 +30,7 @@ export const mapRawArticles = (rawArticle: GoogleSpreadsheetRow): Article => ({
   spotlight: !!rawArticle.get(SPOTLIGHT),
   feature: !!rawArticle.get(FEATURE),
   updatedAt: rawArticle.get(DATE),
+  locations: rawArticle.get(LOCATIONS) ? rawArticle.get(LOCATIONS).split(',').map((location: string) => location.trim()) : [],
   portraitImage: rawArticle.get(PORTRAIT_IMAGE) ?? null,
   landscapeImage: rawArticle.get(LANDSCAPE_IMAGE) ?? null,
 })

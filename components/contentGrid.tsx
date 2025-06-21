@@ -14,32 +14,37 @@ type MixedItem =
 type ComponentProps = {
   articles: ArticleTileType[]
   locations: LocationTileType[]
+  sortBy?: 'updatedAt' | 'alphabetical'
 }
 
 export default function ContentGrid({
   articles,
   locations,
+  sortBy = 'updatedAt',
 }: ComponentProps) {
   const [mixedContent, setMixedContent] = useState<MixedItem[]>([])
 
   useEffect(() => {
-    const sortedLocations = [...locations].sort(
-      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    )
-
     const combined: MixedItem[] = [
       ...articles.map((a) => ({ type: 'ArticleTile' as const, data: a })),
-      ...sortedLocations.map((l) => ({ type: 'LocationTile' as const, data: l })),
+      ...locations.map((l) => ({ type: 'LocationTile' as const, data: l })),
     ]
 
-    // Shuffle
-    for (let i = combined.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[combined[i], combined[j]] = [combined[j], combined[i]]
+    // Sort based on the sortBy prop
+    if (sortBy === 'updatedAt') {
+      combined.sort((a, b) => 
+        new Date(b.data.updatedAt).getTime() - new Date(a.data.updatedAt).getTime()
+      )
+    } else if (sortBy === 'alphabetical') {
+      combined.sort((a, b) => {
+        const aTitle = a.type === 'ArticleTile' ? a.data.title : a.data.name
+        const bTitle = b.type === 'ArticleTile' ? b.data.title : b.data.name
+        return aTitle.toLowerCase().localeCompare(bTitle.toLowerCase())
+      })
     }
 
     setMixedContent(combined)
-  }, [articles, locations])
+  }, [articles, locations, sortBy])
 
   return (
     <div
@@ -49,7 +54,7 @@ export default function ContentGrid({
           flexDirection: 'column',
           justifyContent: 'space-around',
           alignItems: 'center',
-          width: '80vw',
+          width: '100%',
         }
       }
     >
