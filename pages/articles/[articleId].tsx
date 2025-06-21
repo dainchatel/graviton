@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { Layout, Markdown, ContentGrid } from '@/graviton/components'
 import { Article as ArticleType, DropdownLocation, ArticleTile as ArticleTileType, LocationTile as LocationTileType } from '@/graviton/types'
 import { fetchData } from '@/graviton/lib/data'
@@ -58,18 +57,20 @@ export default function Article({ article, dropdownLocations, recommendedArticle
           <>{new Date(article.updatedAt!).toDateString()}</>
           <Markdown value={article.text} />
         </div>
-        {(recommendedArticles.length > 0 || recommendedLocations.length > 0) ? (
-          <div style={{ marginTop: '2rem', width: '100%', maxWidth: '832px' }}>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', textAlign: 'center' }}>
-              Read More
-            </h3>
-            <ContentGrid
-              articles={recommendedArticles}
-              locations={recommendedLocations}
-              sortBy="updatedAt"
-            />
-          </div>
-        ) : null}
+        {
+          (recommendedArticles.length > 0 || recommendedLocations.length > 0) ? (
+            <div style={{ marginTop: '2rem', width: '100%', maxWidth: '832px' }}>
+              <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', textAlign: 'center' }}>
+                Read More
+              </h3>
+              <ContentGrid
+                articles={recommendedArticles}
+                locations={recommendedLocations}
+                sortBy="updatedAt"
+              />
+            </div>
+          ) : null
+        }
       </div>
     </Layout>
   )

@@ -33,7 +33,7 @@ export default function ContentGrid({
     // Sort based on the sortBy prop
     if (sortBy === 'updatedAt') {
       combined.sort((a, b) => 
-        new Date(b.data.updatedAt).getTime() - new Date(a.data.updatedAt).getTime()
+        new Date(b.data.updatedAt).getTime() - new Date(a.data.updatedAt).getTime(),
       )
     } else if (sortBy === 'alphabetical') {
       combined.sort((a, b) => {

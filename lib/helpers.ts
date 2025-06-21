@@ -3,7 +3,7 @@ import { Article, Location, ArticleTile, LocationTile } from '@/graviton/types'
 export const getRecommendedContent = (
   currentArticle: Article,
   allArticles: Article[],
-  allLocations: Location[]
+  allLocations: Location[],
 ): { recommendedArticles: ArticleTile[]; recommendedLocations: LocationTile[] } => {
   // Get location tiles for the article's locations
   const articleLocationTiles = allLocations
