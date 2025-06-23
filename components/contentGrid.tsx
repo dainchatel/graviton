@@ -60,14 +60,24 @@ export default function ContentGrid({
     >
       <div
         style={
-          {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '1rem',
-            width: '100%',
-            alignItems: 'stretch',
-            marginTop: '1rem',
-          }
+          mixedContent.length === 1
+            ? {
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '1rem',
+              width: 'auto',
+              alignItems: 'stretch',
+              marginTop: '1rem',
+              justifyItems: 'center',
+            }
+            : {
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '1rem',
+              width: '100%',
+              alignItems: 'stretch',
+              marginTop: '1rem',
+            }
         }
       >
         {

@@ -1,13 +1,13 @@
 import '@testing-library/jest-dom'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import Home from '@/graviton/pages'
 import { name } from '@/graviton/constants'
-import { mockArticles, mockLocations, mockDropdownLocations } from './fixtures/index'
+import { mockArticles, mockLocations, mockStays, mockDropdownLocations } from './fixtures'
 
-const mockPush = jest.fn()
+const mockReplace = jest.fn()
 jest.mock('next/router', () => ({
   useRouter: () => ({
-    push: mockPush,
+    replace: mockReplace,
     pathname: '/',
     query: {},
     asPath: '/',
@@ -17,113 +17,112 @@ jest.mock('next/router', () => ({
 
 describe('Home page', () => {
   beforeEach(() => {
-    mockPush.mockClear()
+    mockReplace.mockClear()
+    render(
+      <Home
+        articles={mockArticles}
+        locations={mockLocations}
+        stays={mockStays}
+        dropdownLocations={mockDropdownLocations}
+      />,
+    )
   })
 
   it('renders heading', () => {
-    render(
-      <Home
-        articleTiles={mockArticles}
-        locationTiles={mockLocations}
-        dropdownLocations={mockDropdownLocations}
-        spotlight={mockArticles[0]}
-      />,
-    )
-
     expect(screen.getByText(name)).toBeInTheDocument()
   })
-
-  it('reveals city options when dropdown is clicked', () => {
-    render(
-      <Home
-        articleTiles={mockArticles}
-        locationTiles={mockLocations}
-        dropdownLocations={mockDropdownLocations}
-        spotlight={mockArticles[0]}
-      />,
-    )
-
-    const dropdownBtn = screen.getByRole('button', { name: /cities/i })
-    fireEvent.click(dropdownBtn)
-
-    mockLocations.forEach(loc =>
-      expect(screen.getByText(loc.name)).toBeInTheDocument(),
-    )
-  })
-
-  it('submits a search query and navigates to /results', () => {
-    render(
-      <Home
-        articleTiles={mockArticles}
-        locationTiles={mockLocations}
-        dropdownLocations={mockDropdownLocations}
-        spotlight={mockArticles[0]}
-      />,
-    )
-
-    const input = screen.getByPlaceholderText(/search/i)
-    fireEvent.change(input, { target: { value: 'tokyo' } })
-
-    expect((input as HTMLInputElement).value).toBe('tokyo')
-
-    fireEvent.submit(input.closest('form') as HTMLFormElement)
-
-    expect(mockPush).toHaveBeenCalledWith({
-      pathname: '/results',
-      query: { q: 'tokyo' },
+  
+  it('renders all articles and locations when search is empty', () => {
+    mockArticles.forEach(article => {
+      expect(screen.getByText(article.title)).toBeInTheDocument()
+    })
+    mockLocations.forEach(location => {
+      expect(
+        screen.getByText((content, element) =>
+          element?.tagName.toLowerCase() === 'strong' &&
+          new RegExp(`Our\\s+\\d+\\s+Favorite Stays in\\s+${location.name}`, 'i').test(content),
+        ),
+      ).toBeInTheDocument()
     })
   })
 
-  it('renders header article, sub-header tiles, and updated-location tiles', () => {
-    render(
-      <Home
-        articleTiles={mockArticles}
-        locationTiles={mockLocations}
-        dropdownLocations={mockDropdownLocations}
-        spotlight={mockArticles[0]}
-      />,
-    )
+  describe('Search and Filtering', () => {
+    it('filters articles by title', async () => {
+      const input = screen.getByPlaceholderText(/search/i)
+      fireEvent.change(input, { target: { value: 'Weekend' } })
 
-    /* header:true article */
-    expect(
-      screen.getByText(mockArticles.find(article => article.spotlight)?.title ?? 'This will never match'),
-    ).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByText('Weekend in Lisbon')).toBeInTheDocument()
+        expect(screen.queryByText('Exploring Hidden Tokyo')).not.toBeInTheDocument()
+      })
+    })
 
-    /* all subHeader:true titles appear in the grid */
-    const subHeaderTitles = mockArticles
-      .filter(a => a.feature)
-      .map(a => a.title)
+    it('filters articles by text content', async () => {
+      const input = screen.getByPlaceholderText(/search/i)
+      fireEvent.change(input, { target: { value: 'bookshops' } })
 
-    subHeaderTitles.forEach(title =>
-      expect(screen.getByText(title)).toBeInTheDocument(),
-    )
+      await waitFor(() => {
+        expect(screen.getByText('Exploring Hidden Tokyo')).toBeInTheDocument()
+        expect(screen.queryByText('Weekend in Lisbon')).not.toBeInTheDocument()
+      })
+    })
 
-    /* every location that has updatedAt is shown as a tile */
-    const updatedLocations = mockLocations
-      .filter(l => l.updatedAt)
+    it('filters locations based on matching stays', async () => {
+      const input = screen.getByPlaceholderText(/search/i)
+      fireEvent.change(input, { target: { value: 'rooftop terrace' } })
 
-    updatedLocations.forEach(location =>
-      expect(screen.getByText(`Our ${location.numberOfStays} Favorite Stays in ${location.name}`)).toBeInTheDocument(),
-    )
+      await waitFor(() => {
+        expect(
+          screen.getByText((content, element) =>
+            element?.tagName.toLowerCase() === 'strong' &&
+            /Our\s+\d+\s+Favorite Stays in\s+Berlin/i.test(content),
+          ),
+        ).toBeInTheDocument()
+        expect(
+          screen.queryByText((content, element) =>
+            element?.tagName.toLowerCase() === 'strong' &&
+            /Our\s+\d+\s+Favorite Stays in\s+Tokyo/i.test(content),
+          ),
+        ).not.toBeInTheDocument()
+      })
+    })
+    
+    it('shows no results for a query with no matches', async () => {
+      const input = screen.getByPlaceholderText(/search/i)
+      fireEvent.change(input, { target: { value: 'zzzzzzzz' } })
+
+      await waitFor(() => {
+        mockArticles.forEach(article => {
+          expect(screen.queryByText(article.title)).not.toBeInTheDocument()
+        })
+      })
+    })
+    
+    it('updates the URL with the search query', async () => {
+      const input = screen.getByPlaceholderText(/search/i)
+      fireEvent.change(input, { target: { value: 'testquery' } })
+
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalledWith(
+          {
+            pathname: '/',
+            query: { q: 'testquery' },
+          },
+          undefined,
+          { shallow: true },
+        )
+      })
+    })
   })
 
-  it('article cards contain working links', () => {
-    render(
-      <Home
-        articleTiles={mockArticles}
-        locationTiles={mockLocations}
-        dropdownLocations={mockDropdownLocations}
-        spotlight={mockArticles[0]}
-      />,
-    )
-
-    const hrefs = screen
-      .getAllByRole('link')
-      .map(link => link.getAttribute('href'))
+  it('article and location tiles contain working links', () => {
+    const links = screen.getAllByRole('link')
+    const hrefs = links.map(link => link.getAttribute('href'))
 
     expect(hrefs).toEqual(
       expect.arrayContaining([
-        expect.stringMatching(/^\/articles\/[\w-]+/), // dynamic article URLs
+        expect.stringMatching(/^\/articles\/.+/),
+        expect.stringMatching(/^\/locations\/.+/),
       ]),
     )
   })

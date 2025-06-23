@@ -1,5 +1,5 @@
 import { DropdownLocation, LocationTile } from '@/graviton/types'
-import { ContentGrid, Layout, SearchInput } from '@/graviton/components'
+import { ContentGrid, Layout } from '@/graviton/components'
 import { fetchData } from '@/graviton/lib/data'
 import { asLocationTile } from '@/graviton/lib/locations'
 
@@ -43,7 +43,6 @@ export default function Locations({ dropdownLocations, locations }: PageProps) {
           flexGrow: '1',
         }
       }>
-        <SearchInput/>
         <div style={{ width: '80vw' }}>
           <ContentGrid articles={[]} locations={locations} sortBy="alphabetical" />
         </div>
