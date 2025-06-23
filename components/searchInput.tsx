@@ -3,7 +3,12 @@ import { useRouter } from 'next/router'
 import { Plane } from 'lucide-react'
 import { brandColor } from '@/graviton/constants'
 
-export default function SearchInput () {
+type SearchInputProps = {
+  onSearch?: (query: string) => void
+  value?: string
+}
+
+export default function SearchInput({ onSearch, value }: SearchInputProps) {
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -12,10 +17,27 @@ export default function SearchInput () {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
-    router.push({
-      pathname: '/results',
-      query: { q: query },
-    })
+    
+    if (onSearch) {
+      // Client-side search
+      onSearch(query)
+      setIsLoading(false)
+    } else {
+      // Server-side search (existing behavior)
+      router.push({
+        pathname: '/results',
+        query: { q: query },
+      })
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value
+    if (value === undefined) setQuery(newQuery)
+    // Real-time search if onSearch is provided
+    if (onSearch) {
+      onSearch(newQuery)
+    }
   }
 
   return (
@@ -50,8 +72,8 @@ export default function SearchInput () {
             <input
               id="search"
               type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={value !== undefined ? value : query}
+              onChange={handleInputChange}
               placeholder="Search destinations"
               style={
                 {
@@ -104,7 +126,6 @@ export default function SearchInput () {
               )
             }
           </button>
-
         </div>
       </form>
     </div>

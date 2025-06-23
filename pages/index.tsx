@@ -1,42 +1,76 @@
+'use client'
 import { Layout, SearchInput, ContentGrid } from '@/graviton/components'
 import { fetchData } from '@/graviton/lib/data'
-import { ArticleTile, DropdownLocation, LocationTile } from '@/graviton/types'
-import { asArticleTile } from '@/graviton/lib/articles'
-import { asLocationTile } from '../lib/locations'
+import { Article, Location, Stay, DropdownLocation } from '@/graviton/types'
+import { useState, useMemo, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { filterContentByQuery } from '@/graviton/lib/helpers'
+
+// --- Fade animation styles ---
+const fadeStyles: React.CSSProperties = {
+  transition: 'opacity 0.3s',
+  opacity: 1,
+}
+
+const fadeOutStyles: React.CSSProperties = {
+  ...fadeStyles,
+  opacity: 0,
+}
 
 type PageProps = {
   dropdownLocations: DropdownLocation[]
-  spotlight: ArticleTile
-  articleTiles: ArticleTile[]
-  locationTiles: LocationTile[]
+  articles: Article[]
+  locations: Location[]
+  stays: Stay[]
 }
+
 export async function getServerSideProps(): Promise<{ props: PageProps }> {
-  const { dropdownLocations, locations, articles } = await fetchData()
-  const spotlightArticle = articles
-    .find(article => article.spotlight)
-    
-  if (!spotlightArticle) {
-    throw new Error('No spotlight article!')
-  }
- 
-  const articleTiles = articles
-    .map(asArticleTile)
-    
-  const locationTiles = locations
-    .map(asLocationTile)
+  const { dropdownLocations, locations, articles, stays } = await fetchData()
    
   return {
     props: {
       dropdownLocations,
-      spotlight: asArticleTile(spotlightArticle),
-      articleTiles,
-      locationTiles,
+      articles,
+      locations,
+      stays,
     },
   }
-
 }
 
-export default function Home(props: PageProps) {  
+export default function Home(props: PageProps) {
+  const router = useRouter()
+  const [rawQuery, setRawQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [fading, setFading] = useState(false)
+
+  // Initialize search from URL or reset when navigating home
+  useEffect(() => {
+    if (!router.isReady) return
+    const urlQuery = typeof router.query.q === 'string' ? router.query.q : ''
+    setRawQuery(urlQuery)
+    setSearchQuery(urlQuery)
+  }, [router.query.q, router.pathname, router.isReady])
+
+  // Debounce the search input
+  useEffect(() => {
+    if (rawQuery === searchQuery) return
+    setFading(true)
+    const handler = setTimeout(() => {
+      setSearchQuery(rawQuery)
+      setFading(false)
+      // Update the URL with the query param (shallow routing)
+      router.replace({
+        pathname: router.pathname,
+        query: rawQuery ? { q: rawQuery } : {},
+      }, undefined, { shallow: true })
+    }, 300)
+    return () => clearTimeout(handler)
+  }, [rawQuery, searchQuery, router])
+
+  const filteredContent = useMemo(() => {
+    return filterContentByQuery(searchQuery, props.articles, props.locations, props.stays)
+  }, [searchQuery, props.articles, props.locations, props.stays])
+  
   return (
     <Layout dropdownLocations={props.dropdownLocations}>
       <section style={
@@ -48,10 +82,14 @@ export default function Home(props: PageProps) {
           flexGrow: '1',
         }
       }>
-        <SearchInput/>
-        {/* <Spotlight article={props.spotlight} /> */}
-        <div style={{ width: '80vw' }}>
-          <ContentGrid articles={props.articleTiles} locations={props.locationTiles} />
+        <SearchInput onSearch={setRawQuery} value={rawQuery} />
+        <div style={{ width: '80vw', minHeight: 400 }}>
+          <div style={fading ? fadeOutStyles : fadeStyles}>
+            <ContentGrid 
+              articles={filteredContent.articles} 
+              locations={filteredContent.locations} 
+            />
+          </div>
         </div>
       </section>
     </Layout>
