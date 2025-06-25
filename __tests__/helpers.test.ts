@@ -61,6 +61,18 @@ describe('filterContentByQuery', () => {
     expect(locations[0].name).toBe('Berlin')
   })
 
+  it('filters locations based on state in stay addresses', () => {
+    const { locations } = filterContentByQuery('Florida', mockArticles, mockLocations, mockStays)
+    expect(locations.length).toBe(1)
+    expect(locations[0].name).toBe('Miami')
+  })
+
+  it('filters locations based on zip code in stay addresses', () => {
+    const { locations } = filterContentByQuery('33133', mockArticles, mockLocations, mockStays)
+    expect(locations.length).toBe(1)
+    expect(locations[0].name).toBe('Miami')
+  })
+
   it('returns both articles and locations that match', () => {
     const { articles, locations } = filterContentByQuery('Berlin', mockArticles, mockLocations, mockStays)
     expect(articles.length).toBe(2)

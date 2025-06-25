@@ -52,7 +52,7 @@ export const filterContentByQuery = (
     minMatchCharLength: 4,
   })
   const stayFuseShort = new Fuse(stays, {
-    keys: ['name', 'location', 'description'],
+    keys: ['name', 'location', 'description', 'address'],
     threshold: 0.4,
   })
   const stayFuseLong = new Fuse(stays, {

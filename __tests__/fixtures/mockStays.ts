@@ -431,7 +431,7 @@ const miamiStays: Stay[] = [
     coordinates: '25.7650, -80.2195',
     location: 'Miami',
     link: 'little_havana_guesthouse_link',
-    address: 'Little Havana, Miami',
+    address: 'Little Havana, Miami, Florida 33133',
     price: '$$',
   },
   {
