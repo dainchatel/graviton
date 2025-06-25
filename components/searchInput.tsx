@@ -16,19 +16,19 @@ export default function SearchInput({ onSearch, value }: SearchInputProps) {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setIsLoading(true)
     
+    // If onSearch is provided, we're in client-side filtering mode
+    // so we don't need form submission - just prevent default
     if (onSearch) {
-      // Client-side search
-      onSearch(query)
-      setIsLoading(false)
-    } else {
-      // Server-side search (existing behavior)
-      router.push({
-        pathname: '/results',
-        query: { q: query },
-      })
+      return
     }
+    
+    // Server-side search (existing behavior)
+    setIsLoading(true)
+    router.push({
+      pathname: '/results',
+      query: { q: query },
+    })
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
